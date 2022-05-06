@@ -22,39 +22,40 @@ app.get("/",(req,res) => {
 var session_url = {};
 
 app.post('*',(req,res) => {
-  const { session_id, card } = req.body;
+  const { session_id, name_session, card } = req.body;
   if (!session_url.hasOwnProperty(session_id)){
+    session_url[session_id] = {};
+  }
+
+ // session_url[session_id].push(parseInt(card));
+  session_url[session_id][name_session] = parseInt(card);
+
+  console.log(session_url);
+
+  var all_cards = []
+  stringToSend = ""
+  //get tab of all chosen cards
+  for (var session in session_url){
+    for (var name in session_url[session]){
+      stringToSend += name + " : " + session_url[session][name] + "    ";
+      all_cards.push(session_url[session][name])
+    }
+  }
+
+  if (all_cards.length >= 5){
+    const sum = all_cards.reduce((a, b) => a + b, 0);
+    const average = (sum / all_cards.length) || 0;
+    res.send("Your Card : " + card + "           List of all chosen card : " + stringToSend + " Average : " + average);
+
     session_url[session_id] = new Array();
   }
 
-  session_url[session_id].push(parseInt(card));
 
-  if (session_url[session_id].length >= 5){
-    const sum = chosen_card.reduce((a, b) => a + b, 0);
-    const average = (sum / chosen_card.length) || 0;
-    res.send("Average : " + average);
 
-    session_url[session_id] = new Array();
-  }
   
-  res.send("Confirmed Card : " + card + "           List of all chosen card : " + session_url[session_id]);
+  
+  res.send("Your Card : " + card + "           List of all chosen card : " + stringToSend);
 
 });
-
-/*app.post('/session', function(req, res, next) {
-  const { card } = req.body;
-  chosen_card[nb_users] = parseInt(card);
-  nb_users ++;
-
-  if (nb_users >= 5){
-    const sum = chosen_card.reduce((a, b) => a + b, 0);
-    const average = (sum / chosen_card.length) || 0;
-    res.send("Average : " + average);
-    nb_users = 0
-    chosen_card = Array(5).fill(null);
-  } 
-  
-  res.send("Confirmed Card : " + card + "           List of all chosen card : " + chosen_card);
-});*/
 
 module.exports = app;

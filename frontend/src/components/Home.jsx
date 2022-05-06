@@ -5,7 +5,7 @@ function Home() {
 
   var [id_modif, setInputValue] = useState("");
 
-  async function handleClick(){
+  async function handleClickKey(){
     await fetch("http://localhost:9000/", {
       })
       .then(res => res.text())
@@ -30,7 +30,7 @@ function Home() {
             <p>
               Welcome to the Planning poker Application
             </p>
-            <button onClick={() => handleClick()}>Generate Key</button>
+            <button onClick={() => handleClickKey()}>Generate Key</button>
             <p>Your Session Key : {id_modif}</p>
             <li className="nav-item">
                 <NavLink className="nav-link" to={`/Planning_poker/${id_modif}`}>
