@@ -1,7 +1,7 @@
   .main {
     font-family: 'Crete Round', serif;
-	font-size: 20px;
-	color: #444;
+	  font-size: 16px;
+	  color: #444;
     text-align: center;
   }
   
@@ -88,5 +88,80 @@
   
   .kbd-navigation .square:focus {
     background: #ddd;
+  }
+
+  form {
+    text-align: center;
+    flex-wrap: wrap;
+  }
+  
+  input {
+    border: none;
+    margin: 10px;
+    background: hsl(0 0% 93%);
+    border-radius: .25rem;
+    padding: .75rem 1rem;
+  
+  }
+
+  .reset {
+    display: inline-block;
+    padding: 5px px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    background-color: #FB1138;
+  
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+  }
+  
+  .reset:hover {background-color: #C70039}
+  
+  .reset:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+  }
+
+  .confirm {
+    display: inline-block;
+    padding: 15px 25px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+  }
+  
+  .confirm:hover {background-color: #3e8e41}
+  
+  .confirm:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+  }
+
+  .box {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px 2em;
+  }
+  
+  .box :first-child {
+      align-self: center;
   }
   

@@ -32,7 +32,7 @@ function Home() {
             <h1>
               Welcome to the Planning poker Application
             </h1>
-            <button onClick={() => handleClick()} class="button">Generate Key</button>
+            <button onClick={() => handleClickKey()} class="button">Generate Key</button>
             <p class="session-key" id="session-key">Your Session Key : {id_modif}</p>
             <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/Planning_poker/${id_modif}`}>
                  Planning poker
