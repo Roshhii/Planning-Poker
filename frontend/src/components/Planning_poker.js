@@ -147,7 +147,7 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
     render() {
       
       return (
-        <div>
+        <div class="main">
           <div><h2>Id : <Id/></h2></div>
           <div className="board-row">
             {this.renderSquare(0)}
