@@ -49,6 +49,8 @@
     height: 90px;
     width: 60px;
     margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     justify-content: center;
     line-height: 1;
     list-style: none;
@@ -65,21 +67,6 @@
     white-space: nowrap;
     will-change: box-shadow,transform;
     font-size: 18px;
-  }
-
-  .reset {
-    background: rgb(49, 159, 171);
-    border: 1px solid #999;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 39px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 78px;
   }
   
   .card:focus {
@@ -106,7 +93,8 @@
 
   .reset {
     display: inline-block;
-    padding: 5px px;
+    margin-left: 20px;
+    padding: 15px 25px;
     font-size: 20px;
     cursor: pointer;
     text-align: center;
@@ -114,9 +102,8 @@
     outline: none;
     color: #fff;
     margin-top: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     background-color: #FB1138;
-  
     border: none;
     border-radius: 15px;
     box-shadow: 0 9px #999;
@@ -125,12 +112,13 @@
   .reset:hover {background-color: #C70039}
   
   .reset:active {
-    background-color: #3e8e41;
+    background-color: #C70039;
     box-shadow: 0 5px #666;
     transform: translateY(4px);
   }
 
   .confirm {
+    margin-left: 10px;
     display: inline-block;
     padding: 15px 25px;
     font-size: 20px;
@@ -164,4 +152,20 @@
   .box :first-child {
       align-self: center;
   }
+
+  #line-cards-buttons {
+    white-space: nowrap;
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.child {
+    display: inline-block;
+}
+
+.grid-selected {
+  text-align: center;
+  display: grid;
+  grid-template-columns: auto auto;
+}
   
