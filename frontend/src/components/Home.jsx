@@ -6,7 +6,7 @@ function Home() {
 
   var [id_modif, setInputValue] = useState("");
 
-  async function handleClick(){
+  async function handleClickKey(){
     await fetch("http://localhost:9000/", {
       })
       .then(res => res.text())
