@@ -46,6 +46,17 @@ import {useParams} from "react-router-dom"
     );
   }
 
+  function Show(props){
+    return (
+      <button
+        className="reset"
+        onClick={props.onClick}
+      >
+        {props.value}
+      </button>
+    );
+  }
+
   var Id_session;
   var name_session;
 
@@ -97,7 +108,9 @@ import {useParams} from "react-router-dom"
             squares: [0,1,2,3,5,8,13,20,40,100],
             selectedCard: null,
             Backend_response: "",
-            confirmed: false
+            estimations: "",
+            confirmed: false,
+            isShow: false
         };
     }
 
@@ -147,7 +160,9 @@ import {useParams} from "react-router-dom"
         squares: this.state.squares,
         selectedCard: null,
         Backend_response: "",
-        confirmed : false
+        confirmed : false,
+        estimations: "",
+        isShow: false
       });
     }
 
@@ -166,7 +181,6 @@ import {useParams} from "react-router-dom"
         this.setState({
           squares: this.state.squares,
           selectedCard: this.state.selectedCard,
-          Backend_response: this.state.Backend_response,
           confirmed : true
         });
         this.callBackend()
@@ -181,8 +195,41 @@ import {useParams} from "react-router-dom"
         />
     );
     }
+
+    handleShowClick(){
+      if (this.state.isShow){
+        this.setState({
+          estimations: "",
+          isShow: false
+        });
+      }
+      else{
+        this.setState({
+          estimations: this.state.Backend_response,
+          isShow: true
+        });
+      }
+      console.log(JSON.parse(this.state.Backend_response));
+     
+    }
+
+    renderShow(){
+      return (
+        <Show
+            value={<div>Show</div>}
+            onClick={() => this.handleShowClick()}
+        />)
+    }
   
     render() {
+
+      let confirm_mes
+      if (this.state.confirmed){
+        confirm_mes = <p>Confirmed</p>
+      }
+      else {
+        confirm_mes = <p>Not Confirmed</p>
+      }
 
       
       return (
@@ -205,9 +252,11 @@ import {useParams} from "react-router-dom"
             {<h1>Selected Card :</h1>}
             {this.renderSelectedCard()}
             {this.renderReset()}
-            <p>{this.state.Backend_response}</p>
+            <p>{this.state.estimations}</p>
           </div>  
             <div>{this.renderConfirm()}</div>
+            <p>{confirm_mes}</p>
+            <div>{this.renderShow()}</div>
         </div>
       );
     }

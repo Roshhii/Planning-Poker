@@ -27,34 +27,33 @@ app.post('*',(req,res) => {
     session_url[session_id] = {};
   }
 
- // session_url[session_id].push(parseInt(card));
   session_url[session_id][name_session] = parseInt(card);
 
   console.log(session_url);
 
   var all_cards = []
-  stringToSend = ""
+  stringToSend = '{"Users": ['
   //get tab of all chosen cards
-  for (var session in session_url){
-    for (var name in session_url[session]){
-      stringToSend += name + " : " + session_url[session][name] + "    ";
-      all_cards.push(session_url[session][name])
+    for (var name in session_url[session_id]){
+      if (all_cards.length != 0){
+        stringToSend += ", ";
+      }
+      stringToSend += '{"name": ' + '"' + name + '", ' + '"card": ' +session_url[session_id][name] + "}";
+      
+      all_cards.push(session_url[session_id][name]);
     }
-  }
+  stringToSend += "]}";
 
   if (all_cards.length >= 5){
-    const sum = all_cards.reduce((a, b) => a + b, 0);
+   /* const sum = all_cards.reduce((a, b) => a + b, 0);
     const average = (sum / all_cards.length) || 0;
     res.send("Your Card : " + card + "           List of all chosen card : " + stringToSend + " Average : " + average);
 
-    session_url[session_id] = new Array();
+    session_url[session_id] = new Array();*/
   }
+  console.log(JSON.parse(stringToSend))
 
-
-
-  
-  
-  res.send("Your Card : " + card + "           List of all chosen card : " + stringToSend);
+  res.send(stringToSend);
 
 });
 
