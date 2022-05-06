@@ -30,7 +30,7 @@ import {useParams} from "react-router-dom"
         className="reset"
         onClick={props.onClick}
       >
-        {props.value}
+        Reset
       </button>
     );
   }
@@ -38,10 +38,10 @@ import {useParams} from "react-router-dom"
   function Confirm(props){
     return (
       <button
-        className="reset"
+        className="coonfirm"
         onClick={props.onClick}
       >
-        {props.value}
+        Confirm
       </button>
     );
   }
@@ -49,10 +49,10 @@ import {useParams} from "react-router-dom"
   function Show(props){
     return (
       <button
-        className="reset"
+        className="show"
         onClick={props.onClick}
       >
-        {props.value}
+        Show
       </button>
     );
   }
@@ -78,14 +78,13 @@ import {useParams} from "react-router-dom"
 
     return (
       <form onSubmit={handleSubmit}>
-        <label>
-          Name:
+     
           <input
             type="text"
+            placeholder="Enter a name"
             value={name}
             onChange={handleChange}
           />
-        </label>
         <input type="submit" value="Submit" />
         <p>Your Name : {nameDisplay}</p>
       </form>
@@ -249,15 +248,17 @@ import {useParams} from "react-router-dom"
             {this.renderSquare(9)}
           </div>
           <div className="board-row">
-            {<h1>Selected Card :</h1>}
-            {this.renderSelectedCard()}
-            {this.renderReset()}
+            {<h3>Selected Card :</h3>}
+            <div class="box">
+              <div> {this.renderReset()} </div>
+              <div> {this.renderSelectedCard()} </div>
+              <div> {this.renderConfirm()}} </div>
+            </div>
             <p>{this.state.estimations}</p>
-          </div>  
-            <div>{this.renderConfirm()}</div>
             <p>{confirm_mes}</p>
             <div>{this.renderShow()}</div>
-        </div>
+          </div>
+         </div>
       );
     }
   }

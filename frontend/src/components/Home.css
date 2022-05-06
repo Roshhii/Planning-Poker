@@ -16,16 +16,16 @@
     color: #fff;
     margin-top: 10px;
     margin-bottom: 10px;
-    background-color: #4CAF50;
+    background-color: #7A8FAF;
     border: none;
     border-radius: 15px;
     box-shadow: 0 9px #999;
   }
   
-  .button:hover {background-color: #3e8e41}
+  .button:hover {background-color: #6B798E}
   
   .button:active {
-    background-color: #3e8e41;
+    background-color: #6B798E;
     box-shadow: 0 5px #666;
     transform: translateY(4px);
   }

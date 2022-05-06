@@ -7,8 +7,8 @@ function Navigation() {
     <div className="navigation">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
-          <h2>
-            Planning poker Application
+          <h2 class="title-app">
+            Planning Poker Application
           </h2>
           <div>
             <ul className="navbar-nav ml-auto">
