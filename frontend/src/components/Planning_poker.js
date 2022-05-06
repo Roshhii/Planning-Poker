@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from "react";
 import './Planning_poker.css';
 import {useParams} from "react-router-dom"
-import reactElementToJSXString from 'react-element-to-jsx-string';
 
 
   function Card(props){
@@ -48,6 +47,39 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
   }
 
   var Id_session;
+  var name_session;
+
+  function NameForm(props) {
+
+    const [name, setName] = useState("");
+    const [nameDisplay, setNameDisplay] = useState("");
+    
+    const handleSubmit = (evt) => {
+        evt.preventDefault();
+        name_session = name;
+        setNameDisplay(name)
+    }
+
+    const handleChange = (evt) => {
+      evt.preventDefault();
+      setName(evt.target.value)
+    }
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <label>
+          Name:
+          <input
+            type="text"
+            value={name}
+            onChange={handleChange}
+          />
+        </label>
+        <input type="submit" value="Submit" />
+        <p>Your Name : {nameDisplay}</p>
+      </form>
+    );
+  }
 
   function Id(){
     const param = useParams();
@@ -61,6 +93,7 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
     constructor(props){
         super(props)
         this.state = {
+            name: "",
             squares: [0,1,2,3,5,8,13,20,40,100],
             selectedCard: null,
             Backend_response: "",
@@ -69,10 +102,14 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
     }
 
     callBackend(){
+      console.log(name_session);
       fetch("http://localhost:9000/session", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: ""+Id_session, card: ""+this.state.selectedCard })
+          body: JSON.stringify({ session_id: ""+Id_session,
+                                 name_session: ""+name_session,
+                                 card: ""+this.state.selectedCard,
+                                 })
       })
         .then(res => res.text())
         .then(res => this.setState({Backend_response: res}))
@@ -124,7 +161,8 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
     }
 
     handleConfirmClick(){
-      if (this.state.selectedCard != null && !this.state.confirmed){
+      if (name_session == null){alert('Please enter your name to confirm');}
+      else if (this.state.selectedCard != null && !this.state.confirmed){
         this.setState({
           squares: this.state.squares,
           selectedCard: this.state.selectedCard,
@@ -145,9 +183,11 @@ import reactElementToJSXString from 'react-element-to-jsx-string';
     }
   
     render() {
+
       
       return (
         <div>
+          <div><NameForm/></div>
           <div><h2>Id : <Id/></h2></div>
           <div className="board-row">
             {this.renderSquare(0)}
