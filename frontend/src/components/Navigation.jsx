@@ -1,4 +1,5 @@
 import React from "react";
+import './Home.css';
 import { NavLink } from "react-router-dom";
 
 function Navigation() {
@@ -6,16 +7,14 @@ function Navigation() {
     <div className="navigation">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
-          <NavLink className="navbar-brand" to="/">
+          <h2>
             Planning poker Application
-          </NavLink>
+          </h2>
           <div>
             <ul className="navbar-nav ml-auto">
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/">
+            <NavLink className="nav-link" to="/">
                   Home
                 </NavLink>
-              </li>
             </ul>
           </div>
         </div>

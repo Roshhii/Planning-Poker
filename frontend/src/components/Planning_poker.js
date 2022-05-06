@@ -186,7 +186,7 @@ import {useParams} from "react-router-dom"
 
       
       return (
-        <div>
+        <div class="main">
           <div><NameForm/></div>
           <div><h2>Id : <Id/></h2></div>
           <div className="board-row">

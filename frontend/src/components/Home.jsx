@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import './Home.css';
 import { NavLink } from "react-router-dom";
 
 function Home() {
@@ -12,6 +13,8 @@ function Home() {
       .then(function(data) {
         setInputValue(data);
       });
+    document.getElementById("nav-link-Planning").style.display = "block"
+    document.getElementById("session-key").style.display = "block"
   }
   
   return (
@@ -26,17 +29,14 @@ function Home() {
             />
           </div>
           <div class="col-lg-5">
-            <h1 class="font-weight-light">Home page</h1>
-            <p>
+            <h1>
               Welcome to the Planning poker Application
-            </p>
-            <button onClick={() => handleClickKey()}>Generate Key</button>
-            <p>Your Session Key : {id_modif}</p>
-            <li className="nav-item">
-                <NavLink className="nav-link" to={`/Planning_poker/${id_modif}`}>
-                Planning poker
-                </NavLink>
-            </li>
+            </h1>
+            <button onClick={() => handleClick()} class="button">Generate Key</button>
+            <p class="session-key" id="session-key">Your Session Key : {id_modif}</p>
+            <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/Planning_poker/${id_modif}`}>
+                 Planning poker
+            </NavLink>
           </div>
         </div>
       </div>
