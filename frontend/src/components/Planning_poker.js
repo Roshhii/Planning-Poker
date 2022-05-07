@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import './Planning_poker.css';
 import { useParams } from "react-router-dom"
 
+var Id_session;
+var name_session;
+
 
 function Card(props) {
   return (
@@ -58,8 +61,38 @@ function Show(props) {
   );
 }
 
-var Id_session;
-var name_session;
+function UserStoryForm(props) {
+
+  const [userStory, setuserStory] = useState("");
+  const [userStoryDisplay, setuserStoryDisplay] = useState("");
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+  //  name_session = name;
+  setuserStoryDisplay(userStory)
+  }
+
+  const handleChange = (evt) => {
+    evt.preventDefault();
+    setuserStory(evt.target.value)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+
+      <input
+        type="text"
+        placeholder="Enter a User Story"
+        value={userStory}
+        onChange={handleChange}
+      />
+      <input type="submit" value="Create" />
+      <p>The User Story : {userStoryDisplay}</p>
+    </form>
+  );
+}
+
+
 
 function NameForm(props) {
 
@@ -110,7 +143,8 @@ class Planning_poker extends React.Component {
       Backend_response: "",
       estimations: "",
       confirmed: false,
-      isShow: false
+      isShow: false,
+      others_cards: null
     };
   }
 
@@ -139,7 +173,7 @@ class Planning_poker extends React.Component {
 
   }
 
-  renderSquare(i) {
+  renderCard(i) {
     return (
       <Card
         value={this.state.squares[i]}
@@ -163,9 +197,10 @@ class Planning_poker extends React.Component {
       Backend_response: "",
       confirmed: false,
       estimations: "",
-      isShow: false
+      isShow: false,
+      others_cards: null
     });
-    document.getElementById("selected-card").style.backgroundColor = "#FCFCFD"
+    document.getElementById("selected-card").style.backgroundColor = "#FCFCFD";
   }
 
   renderReset() {
@@ -212,7 +247,19 @@ class Planning_poker extends React.Component {
         isShow: true
       });
     }
-    console.log(JSON.parse(this.state.Backend_response));
+
+    var users = JSON.parse(this.state.Backend_response)['Users'];
+
+    var usersCards = [];
+    for (var user in users) {
+        if (users[user]['name'] != name_session){
+          usersCards.push(<strong>{users[user]['name']} : </strong>)
+          usersCards.push(<SelectedCard
+            value={users[user]['card']}
+          />);
+        }
+    }
+    this.setState({others_cards: <div class="grid-child">{usersCards} </div>})
 
   }
 
@@ -226,42 +273,32 @@ class Planning_poker extends React.Component {
 
   render() {
 
-    let confirm_mes
-    if (this.state.confirmed) {
-      confirm_mes = <p>Confirmed</p>
-    }
-    else {
-      confirm_mes = <p>Not Confirmed</p>
-    }
-
-
     return (
       <div class="main">
         <div><NameForm /></div>
         <div><h2>Id : <Id /></h2></div>
+        <div><UserStoryForm/></div>
         <div id="line-cards-buttons">
-          <div class="child">{this.renderSquare(0)}</div>
-          <div class="child">{this.renderSquare(1)}</div>
-          <div class="child">{this.renderSquare(2)}</div>
-          <div class="child">{this.renderSquare(3)}</div>
-          <div class="child">{this.renderSquare(4)}</div>
-          <div class="child">{this.renderSquare(5)}</div>
-          <div class="child">{this.renderSquare(6)}</div>
-          <div class="child">{this.renderSquare(7)}</div>
-          <div class="child">{this.renderSquare(8)}</div>
-          <div class="child">{this.renderSquare(9)}</div>
+          <div class="child">{this.renderCard(0)}</div>
+          <div class="child">{this.renderCard(1)}</div>
+          <div class="child">{this.renderCard(2)}</div>
+          <div class="child">{this.renderCard(3)}</div>
+          <div class="child">{this.renderCard(4)}</div>
+          <div class="child">{this.renderCard(5)}</div>
+          <div class="child">{this.renderCard(6)}</div>
+          <div class="child">{this.renderCard(7)}</div>
+          <div class="child">{this.renderCard(8)}</div>
+          <div class="child">{this.renderCard(9)}</div>
           <div class="child"> {this.renderConfirm()} </div>
           <div class="child"> {this.renderReset()} </div>
         </div>
         <div class="grid-selected">
           <div class="grid-child"><h3>Selected Card:</h3></div>
-          <div class="grid-child"><h3>The other:</h3></div>
+          <div class="grid-child"><h3>The Others:</h3></div>
           <div class="grid-child">{this.renderSelectedCard()}</div>
-          <div class="grid-child">{this.renderSelectedCard()}</div>
+          {this.state.others_cards}
         </div>
-
         <div className="board-row">
-          <p>{this.state.estimations}</p>
           <div>{this.renderShow()}</div>
         </div>
       </div>

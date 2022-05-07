@@ -143,6 +143,32 @@
     transform: translateY(4px);
   }
 
+  .show {
+    margin-left: 10px;
+    display: inline-block;
+    padding: 15px 25px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #4055aa;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+  }
+  
+  .show:hover {background-color: #383086}
+  
+  .show:active {
+    background-color: #29298f;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+  }
+
   .box {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
