@@ -1,60 +1,86 @@
-var express = require('express');
-var app = express.Router();
+const express = require('express');
+const app = express();
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
+app.use(cors());
 
-app.use(express.json());
+const server = http.createServer(app);
 
-function makeid(length) {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * 
-charactersLength));
- }
- return result;
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+function makeElementJSON(name, tab, id) {
+  return {"name": name,"card": tab[id][name]}
 }
 
-app.get("/",(req,res) => {
-  res.send(makeid(10))
-});
-
-
-var session_url = {};
-
-app.post('*',(req,res) => {
-  const { session_id, name_session, card } = req.body;
-  if (!session_url.hasOwnProperty(session_id)){
-    session_url[session_id] = {};
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
   }
+  return result;
+}
 
-  session_url[session_id][name_session] = parseInt(card);
+var session_url = {}
 
-  console.log(session_url);
+io.on('connection', (socket) => {
+  console.log(`User Connected: ${socket.id}`);
 
-  var all_cards = []
-  stringToSend = '{"Users": ['
-  //get tab of all chosen cards
-    for (var name in session_url[session_id]){
-      if (all_cards.length != 0){
+  socket.on("key", (data) => {
+    console.log(`Message from user with ID: ${socket.id}: ${data}`)
+    console.log(`User with ID: ${socket.id} want a key.`)
+    socket.emit("receive_key", makeid(10));
+  })
+
+  socket.on("card", (data) => {
+    console.log("Card event received : " + data);
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var name_session = msg.name_session
+    var card = msg.card
+    if (!session_url.hasOwnProperty(session_id)) {
+      session_url[session_id] = {};
+    }
+
+    session_url[session_id][name_session] = parseInt(card);
+    
+
+    var all_cards = []
+    message = []
+    //stringToSend = '{"Users": ['
+    //get tab of all chosen cards
+    for (var name in session_url[session_id]) {
+      /* if (all_cards.length != 0) {
         stringToSend += ", ";
-      }
-      stringToSend += '{"name": ' + '"' + name + '", ' + '"card": ' +session_url[session_id][name] + "}";
-      
+      } */
+      //stringToSend += '{"name": ' + name + '", ' + '"card": ' + session_url[session_id][name] + "},";
+      message.push(makeElementJSON(name, session_url, session_id));
+
       all_cards.push(session_url[session_id][name]);
     }
-  stringToSend += "]}";
+    //stringToSend += "]}";
+    //socket.emit("receive_card", stringToSend);
+    console.log("Message : " + message)
+    console.log("Message event card all users : " + '{"Users" : ' + JSON.stringify(message) + "}")
+    socket.emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}") ;
 
-  if (all_cards.length >= 5){
-   /* const sum = all_cards.reduce((a, b) => a + b, 0);
-    const average = (sum / all_cards.length) || 0;
-    res.send("Your Card : " + card + "           List of all chosen card : " + stringToSend + " Average : " + average);
+  });
 
-    session_url[session_id] = new Array();*/
-  }
-  console.log(JSON.parse(stringToSend))
-
-  res.send(stringToSend);
-
+  socket.on("disconnect", () => {
+    console.log("User Diconnected", socket.id);
+  });
 });
+
+server.listen(3001, () => {
+  console.log("SERVER RUNNING");
+})
 
 module.exports = app;
