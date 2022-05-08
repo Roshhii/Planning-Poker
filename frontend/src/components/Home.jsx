@@ -1,21 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './Home.css';
 import { NavLink } from "react-router-dom";
 
-function Home() {
+function Home({ socket }) {
 
-  var [id_modif, setInputValue] = useState("");
+  var [session_id, setSessionId] = useState("");
 
-  async function handleClickKey(){
-    await fetch("http://localhost:9000/", {
-      })
-      .then(res => res.text())
-      .then(function(data) {
-        setInputValue(data);
-      });
-    document.getElementById("nav-link-Planning").style.display = "block"
-    document.getElementById("session-key").style.display = "block"
+  const sendKey = () => {
+    socket.emit("key", "I want a key!");
   }
+
+  useEffect(() => {
+    socket.on("receive_key", (data) => {
+      console.log(data);
+      setSessionId(data);
+      document.getElementById("nav-link-Planning").style.display = "block"
+      document.getElementById("session-key").style.display = "block"
+    })
+  }, [socket])
   
   return (
     <div className="home">
@@ -32,9 +34,9 @@ function Home() {
             <h1>
               Welcome to the Planning poker Application
             </h1>
-            <button onClick={() => handleClickKey()} class="button">Generate Key</button>
-            <p class="session-key" id="session-key">Your Session Key : {id_modif}</p>
-            <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/Planning_poker/${id_modif}`}>
+            <button onClick={sendKey} class="button">Generate Key</button>
+            <p class="session-key" id="session-key">Your Session Key : {session_id}</p>
+            <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/Planning_poker/${session_id}`}>
                  Planning poker
             </NavLink>
           </div>
