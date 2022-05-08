@@ -7,16 +7,9 @@ function Navigation() {
     <div className="navigation">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
-          <h2 class="title-app">
-            Planning Poker Application
-          </h2>
-          <div>
-            <ul className="navbar-nav ml-auto">
-            <NavLink className="nav-link" to="/">
-                  Home
-                </NavLink>
-            </ul>
-          </div>
+          <ul>
+            <li><NavLink className="nav-link" to="/">Home</NavLink></li>
+          </ul>
         </div>
       </nav>
     </div>
