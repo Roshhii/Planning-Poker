@@ -92,6 +92,37 @@ function UserStoryForm(props) {
   );
 }
 
+function NameForm(props) {
+
+  const [name, setName] = useState("");
+  const [nameDisplay, setNameDisplay] = useState("");
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    name_session = name;
+    setNameDisplay(name)
+  }
+
+  const handleChange = (evt) => {
+    evt.preventDefault();
+    setName(evt.target.value)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+
+      <input
+        type="text"
+        placeholder="Enter a name"
+        value={name}
+        onChange={handleChange}
+      />
+      <input type="submit" value="Submit" />
+      <p>Your Name : {nameDisplay}</p>
+    </form>
+  );
+}
+
 function Id() {
   const param = useParams();
   session_id = param.id;
@@ -119,11 +150,24 @@ function Planning_poker({ socket }) {
   var [confirmed, serConfirmed] = useState(false);
   var [others_cards, setOtherCards] = useState(null);
 
-  const [name, setName] = useState("");
-  var [nameDisplay, setNameDisplay] = useState("");
 
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
   var isShow = false
+
+  /* const callBackend = () => {
+    console.log(name_session);
+    fetch("http://localhost:9000/"+name_session, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: "" + Id_session,
+        name_session: "" + name_session,
+        card: "" + this. selectedCard,
+      })
+    })
+      .then(res => res.text())
+      .then(res => this.setState({ Backend_response: res }))
+  } */
 
   const callBackend = () => {
     socket.emit("card",
@@ -137,17 +181,7 @@ function Planning_poker({ socket }) {
   useEffect(() => {
     socket.on("receive_card", (data) => {
       setBackendResponse(data)
-    });
-
-    socket.on("receive_user", (data) => {
-      console.log("INFO RECUUUU")
-      var msg = JSON.parse(data)
-      console.log("Username : " + msg.username)
-      name_session = msg.username
-      setNameDisplay(msg.username)
-      console.log("NameDisplay : " + nameDisplay)
-      session_id = msg.session_id
-    });
+    })
   }, [socket])
 
   function handleCardClick(i) {
@@ -236,6 +270,7 @@ function Planning_poker({ socket }) {
 
   }
 
+
   function renderShow() {
     return (
       <Show
@@ -248,8 +283,8 @@ function Planning_poker({ socket }) {
 
   return (
     <div class="main">
-      <div><h2 className="id">Session Id : <Id /></h2></div>
-      <h2>{name_session}</h2>
+      <div><NameForm /></div>
+      <div><h2>Id : <Id /></h2></div>
       <div><UserStoryForm /></div>
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>

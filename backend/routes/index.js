@@ -14,8 +14,6 @@ const io = new Server(server, {
   }
 });
 
-const infoUser = new Map();
-
 function makeElementJSON(name, tab, id) {
   return {"name": name,"card": tab[id][name]}
 }
@@ -40,19 +38,6 @@ io.on('connection', (socket) => {
     console.log(`Message from user with ID: ${socket.id}: ${data}`)
     console.log(`User with ID: ${socket.id} want a key.`)
     socket.emit("receive_key", makeid(10));
-  })
-
-  socket.on("user", (data) => {
-    console.log(`Message from user with ID: ${socket.id}: ${data}`)
-    msg = JSON.parse(data)
-    socket.join(msg.session_id)
-    infoUser.set(msg.username, msg.session_id)
-    console.log("Username : " + (msg.username))
-    console.log("Session_id : " + msg.session_id)
-    socket.emit("receive_user", JSON.stringify({
-      "username": msg.username,
-      "session_id": msg.session_id
-    }))
   })
 
   socket.on("card", (data) => {

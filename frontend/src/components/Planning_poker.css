@@ -94,8 +94,8 @@
   .reset {
     display: inline-block;
     margin-left: 20px;
-    padding: 10px 25px;
-    font-size: 15px;
+    padding: 15px 25px;
+    font-size: 20px;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -120,8 +120,8 @@
   .confirm {
     margin-left: 10px;
     display: inline-block;
-    padding: 10px 25px;
-    font-size: 15px;
+    padding: 15px 25px;
+    font-size: 20px;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -146,8 +146,8 @@
   .show {
     margin-left: 10px;
     display: inline-block;
-    padding: 10px 25px;
-    font-size: 15px;
+    padding: 15px 25px;
+    font-size: 20px;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -193,14 +193,5 @@
   text-align: center;
   display: grid;
   grid-template-columns: auto auto;
-}
-
-.name-form {
-  margin-top: 30px;
-}
-
-.id {
-  text-align: left;
-  margin-left: 30px;
 }
   
