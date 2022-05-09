@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
 import { useParams } from "react-router-dom"
 
+
 var session_id
 var name_session;
 
@@ -61,38 +62,9 @@ function Show(props) {
   );
 }
 
-function UserStoryForm(props) {
 
-  const [userStory, setuserStory] = useState("");
-  const [userStoryDisplay, setuserStoryDisplay] = useState("");
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    //  name_session = name;
-    setuserStoryDisplay(userStory)
-  }
-
-  const handleChange = (evt) => {
-    evt.preventDefault();
-    setuserStory(evt.target.value)
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-
-      <input
-        type="text"
-        placeholder="Enter a User Story"
-        value={userStory}
-        onChange={handleChange}
-      />
-      <input type="submit" value="Create" />
-      <p>The User Story : {userStoryDisplay}</p>
-    </form>
-  );
-}
-
-function NameForm(props) {
+function NameForm() {
 
   const [name, setName] = useState("");
   const [nameDisplay, setNameDisplay] = useState("");
@@ -132,42 +104,19 @@ function Id() {
 
 function Planning_poker({ socket }) {
 
-  /* constructor(props) {
-    super(props)
-    this.state = {
-      name: "",
-      squares: [0, 1, 2, 3, 5, 8, 13, 20, 40, 100],
-      selectedCard: null,
-      Backend_response: "",
-      estimations: "",
-      confirmed: false,
-      isShow: false
-    };
-  } */
-
   var [selectedCard, setSelectedCard] = useState(null);
   var [Backend_response, setBackendResponse] = useState(null);
   var [confirmed, serConfirmed] = useState(false);
   var [others_cards, setOtherCards] = useState(null);
 
 
+  const [userStoryDisplay, setuserStoryDisplay] = useState();
+  const [descriptionUserStory, setdescriptionUserStory]  = useState();
+
+
+
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
   var isShow = false
-
-  /* const callBackend = () => {
-    console.log(name_session);
-    fetch("http://localhost:9000/"+name_session, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        session_id: "" + Id_session,
-        name_session: "" + name_session,
-        card: "" + this. selectedCard,
-      })
-    })
-      .then(res => res.text())
-      .then(res => this.setState({ Backend_response: res }))
-  } */
 
   const callBackend = () => {
     socket.emit("card",
@@ -279,13 +228,91 @@ function Planning_poker({ socket }) {
       />)
   }
 
+  function UserStoryForm() {
+
+    const [userStory, setuserStory] = useState();
+    
+    const handleSubmit = (evt) => {
+      evt.preventDefault();
+      //  name_session = name;
+      setuserStoryDisplay(userStory)
+    }
+  
+    const handleChange = (evt) => {
+      evt.preventDefault();
+      setuserStory(evt.target.value)
+    }
+  
+    return (
+      <form onSubmit={handleSubmit}>
+  
+        <input
+          type="text"
+          placeholder="Enter a User Story"
+          value={userStory}
+          onChange={handleChange}
+        />
+        <input type="submit" value="Create" />
+      </form>
+    );
+  }
+  
+    function JiraImport() {
+      const [file, setFile] = useState()
+      const [XMl, setXML] = useState()
+      var parser, xmlDoc;
+  
+      function handleChange(event) {
+        setFile(event.target.files[0])
+      }
+  
+      function handleSubmit(event) {
+        event.preventDefault()
+  
+        const reader = new FileReader()
+        reader.onload = function(evt) {
+          setXML(evt.target.result);
+        };
+        reader.readAsText(file);
+        
+        //import Jira to USER STORY TEXT
+      }
+
+      function handleClick(){
+        console.log(typeof XMl)
+        parser = new DOMParser();
+        xmlDoc = parser.parseFromString(XMl,"text/xml");
+        
+        setuserStoryDisplay(xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("summary")[0].childNodes[0].nodeValue);
+        var str = xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("description")[0].childNodes[0].nodeValue
+        setdescriptionUserStory(str.substring(3,str.length-4))
+
+      }
+  
+      return (
+        <div className="App">
+          <form onSubmit={handleSubmit}>
+            <h3>Jira Xml User story Upload</h3>
+            <input type="file" onChange={handleChange} />
+            <button type="submit">Upload</button>
+            <button onClick={handleClick}> Import</button>
+          </form>
+        </div>
+      );
+    };
+
+
+
 
 
   return (
     <div class="main">
       <div><NameForm /></div>
       <div><h2>Id : <Id /></h2></div>
+      <div><JiraImport /></div>
       <div><UserStoryForm /></div>
+      <p>{userStoryDisplay}</p>
+      {descriptionUserStory}
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>
         <div class="child">{renderSquare(1)}</div>
