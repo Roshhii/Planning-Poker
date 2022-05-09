@@ -6,7 +6,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {
   Navigation,
   Home,
-  Planning_poker
+  Planning_poker,
+  UserStory
 } from "./components";
 import io from 'socket.io-client'
 
@@ -18,9 +19,8 @@ ReactDOM.render(
     <Navigation />
     <Routes>
       <Route path="/" element={<Home socket={socket}/>} />
-      <Route
-        path="/planning_poker/:id" element={<Planning_poker socket={socket} animate={true} />} />
-
+      <Route path="/planning_poker/:id" element={<Planning_poker socket={socket} animate={true} />} />
+      <Route path="/userStory/:id" element={<UserStory socket={socket} animate={true} />} />
     </Routes>
   </Router>,
 

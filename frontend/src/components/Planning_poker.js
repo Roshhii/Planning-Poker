@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams } from "react-router-dom"
+import { useParams, NavLink } from "react-router-dom"
 
 
-var session_id
 var name_session;
 
 
@@ -93,12 +92,6 @@ function NameForm() {
   );
 }
 
-function Id() {
-  const param = useParams();
-  session_id = param.id;
-  return param.id;
-}
-
 
 function Planning_poker({ socket }) {
 
@@ -114,7 +107,7 @@ function Planning_poker({ socket }) {
   const [descriptionUserStory, setdescriptionUserStory]  = useState();
 
 
-
+  var session_id = useParams().id;
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
   var isShow = false
 
@@ -140,6 +133,10 @@ function Planning_poker({ socket }) {
       setNameDisplay(msg.username)
       console.log("NameDisplay : " + nameDisplay)
       session_id = msg.session_id
+    });
+
+    socket.on("receive_UserForm", (data) => {
+      console.log("USER Form recu du backend"+data);
     });
   }, [socket])
 
@@ -236,90 +233,15 @@ function Planning_poker({ socket }) {
         onClick={() => handleShowClick()}
       />)
   }
-
-  function UserStoryForm() {
-
-    const [userStory, setuserStory] = useState();
-    
-    const handleSubmit = (evt) => {
-      evt.preventDefault();
-      //  name_session = name;
-      setuserStoryDisplay(userStory)
-    }
   
-    const handleChange = (evt) => {
-      evt.preventDefault();
-      setuserStory(evt.target.value)
-    }
-  
-    return (
-      <form onSubmit={handleSubmit}>
-  
-        <input
-          type="text"
-          placeholder="Enter a User Story"
-          value={userStory}
-          onChange={handleChange}
-        />
-        <input type="submit" value="Create" />
-      </form>
-    );
-  }
-  
-    function JiraImport() {
-      const [file, setFile] = useState()
-      const [XMl, setXML] = useState()
-      var parser, xmlDoc;
-  
-      function handleChange(event) {
-        setFile(event.target.files[0])
-      }
-  
-      function handleSubmit(event) {
-        event.preventDefault()
-  
-        const reader = new FileReader()
-        reader.onload = function(evt) {
-          setXML(evt.target.result);
-        };
-        reader.readAsText(file);
-        
-        //import Jira to USER STORY TEXT
-      }
-
-      function handleClick(){
-        console.log(typeof XMl)
-        parser = new DOMParser();
-        xmlDoc = parser.parseFromString(XMl,"text/xml");
-        
-        setuserStoryDisplay(xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("summary")[0].childNodes[0].nodeValue);
-        var str = xmlDoc.getElementsByTagName("item")[0].getElementsByTagName("description")[0].childNodes[0].nodeValue
-        setdescriptionUserStory(str.substring(3,str.length-4))
-
-      }
-  
-      return (
-        <div className="App">
-          <form onSubmit={handleSubmit}>
-            <h3>Jira Xml User story Upload</h3>
-            <input type="file" onChange={handleChange} />
-            <button type="submit">Upload</button>
-            <button onClick={handleClick}> Import</button>
-          </form>
-        </div>
-      );
-    };
-
-
-
-
 
   return (
     <div class="main">
-      <div><h2 className="id">Session Id : <Id /></h2></div>
+      <div><h2 className="id">Session Id : {session_id}</h2></div>
       <h2>{name_session}</h2>
-      <div><JiraImport /></div>
-      <div><UserStoryForm /></div>
+      <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`}>
+          -- Open User Story --
+      </NavLink>
       <p>{userStoryDisplay}</p>
       {descriptionUserStory}
       <div id="line-cards-buttons">

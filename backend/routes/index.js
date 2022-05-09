@@ -89,6 +89,11 @@ io.on('connection', (socket) => {
 
   });
 
+  socket.on("UserForm", (data) => {
+    console.log("RECU User Form" + data)
+    socket.emit("receive_UserForm", "EMIT USERFORM") ;
+  });
+
   socket.on("disconnect", () => {
     console.log("User Diconnected", socket.id);
   });
