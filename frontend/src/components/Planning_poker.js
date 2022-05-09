@@ -62,8 +62,6 @@ function Show(props) {
   );
 }
 
-
-
 function NameForm() {
 
   const [name, setName] = useState("");
@@ -109,6 +107,8 @@ function Planning_poker({ socket }) {
   var [confirmed, serConfirmed] = useState(false);
   var [others_cards, setOtherCards] = useState(null);
 
+  const [name, setName] = useState("");
+  var [nameDisplay, setNameDisplay] = useState("");
 
   const [userStoryDisplay, setuserStoryDisplay] = useState();
   const [descriptionUserStory, setdescriptionUserStory]  = useState();
@@ -130,7 +130,17 @@ function Planning_poker({ socket }) {
   useEffect(() => {
     socket.on("receive_card", (data) => {
       setBackendResponse(data)
-    })
+    });
+
+    socket.on("receive_user", (data) => {
+      console.log("INFO RECUUUU")
+      var msg = JSON.parse(data)
+      console.log("Username : " + msg.username)
+      name_session = msg.username
+      setNameDisplay(msg.username)
+      console.log("NameDisplay : " + nameDisplay)
+      session_id = msg.session_id
+    });
   }, [socket])
 
   function handleCardClick(i) {
@@ -219,7 +229,6 @@ function Planning_poker({ socket }) {
 
   }
 
-
   function renderShow() {
     return (
       <Show
@@ -307,8 +316,8 @@ function Planning_poker({ socket }) {
 
   return (
     <div class="main">
-      <div><NameForm /></div>
-      <div><h2>Id : <Id /></h2></div>
+      <div><h2 className="id">Session Id : <Id /></h2></div>
+      <h2>{name_session}</h2>
       <div><JiraImport /></div>
       <div><UserStoryForm /></div>
       <p>{userStoryDisplay}</p>
