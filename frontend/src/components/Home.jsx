@@ -11,8 +11,8 @@ function NameForm(props) {
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    name_session = name;
     setNameDisplay(name)
+    name_session = name;
   }
 
   const handleChange = (evt) => {
@@ -70,7 +70,10 @@ function Home({ socket }) {
         <button onClick={sendKey} class="button">Generate Key</button>
         <p class="session-key" id="session-key">Your Session Key : {session_id}</p>
         <button onClick={sendInfoUser} id="send-button" class="send-button">Send Info User</button>
-        <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/Planning_poker/${session_id}`}>
+        {/* <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/planning_poker/${session_id}`}>
+          -- Start the session --
+        </NavLink> */}
+        <NavLink id="nav-link-Planning" className="nav-link-Planning" to= {`/planning_poker/${session_id}`} state={{ username: name_session }} >
           -- Start the session --
         </NavLink>
       </div>
