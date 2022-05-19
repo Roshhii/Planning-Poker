@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams, NavLink } from "react-router-dom"
+import { useParams, NavLink, useLocation } from "react-router-dom"
 import './UserStory.css';
 
 
 
 function UserStory( {socket} ) {
+
+    const location = useLocation()
+    var { username, userStory, tasks } = location.state
+    console.log("username : ", username)
+    console.log("userStory : ", userStory)
+
     const param = useParams();
-    const [titleUserStory, setTitleUserStoryy] = useState();
-    const [descriptionUserStory, setDescriptionUserStory]  = useState();
+    const [titleUserStory, setTitleUserStoryy] = useState(userStory);
+    const [descriptionUserStory, setDescriptionUserStory]  = useState(tasks);
 
     function UserStoryForm() {
 
@@ -119,9 +125,7 @@ function UserStory( {socket} ) {
                 "description" : descriptionUserStory
             }));
         }
-
     
-
 
     return (
         <div className="UserStory">
@@ -135,7 +139,7 @@ function UserStory( {socket} ) {
                 <p>User Story : {titleUserStory}</p>
                 <p>Tasks : {descriptionUserStory}</p>
                 <button className="button" onClick={handleClick}>Confirm</button>
-                <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`}>
+                <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username : username, userStory: titleUserStory, tasks :  descriptionUserStory}}>
                     -- Back to Planning Poker --
                 </NavLink>
             </div>

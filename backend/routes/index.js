@@ -17,7 +17,7 @@ const io = new Server(server, {
 const infoUser = new Map();
 
 function makeElementJSON(name, tab, id) {
-  return {"name": name,"card": tab[id][name]}
+  return { "name": name, "card": tab[id][name] }
 }
 
 function makeid(length) {
@@ -55,43 +55,67 @@ io.on('connection', (socket) => {
     }))
   })
 
+
   socket.on("card", (data) => {
     console.log("Card event received : " + data);
     var msg = JSON.parse(data);
     var session_id = msg.session_id
     var name_session = msg.name_session
     var card = msg.card
+    
     if (!session_url.hasOwnProperty(session_id)) {
       session_url[session_id] = {};
     }
-
+  
     session_url[session_id][name_session] = parseInt(card);
-    
-
+  
+  
     var all_cards = []
     message = []
-    //stringToSend = '{"Users": ['
-    //get tab of all chosen cards
+  
     for (var name in session_url[session_id]) {
-      /* if (all_cards.length != 0) {
-        stringToSend += ", ";
-      } */
-      //stringToSend += '{"name": ' + name + '", ' + '"card": ' + session_url[session_id][name] + "},";
+  
       message.push(makeElementJSON(name, session_url, session_id));
-
+  
       all_cards.push(session_url[session_id][name]);
     }
-    //stringToSend += "]}";
-    //socket.emit("receive_card", stringToSend);
+
     console.log("Message : " + message)
     console.log("Message event card all users : " + '{"Users" : ' + JSON.stringify(message) + "}")
     socket.emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}") ;
+    socket.to(session_id).emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}");
 
+  });
+
+  socket.on("show", (data) => {
+    console.log(`Message from user with ID SHOW: ${socket.id}: ${data}`)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+
+    message = []
+    for (var name in session_url[session_id]) {
+      message.push(makeElementJSON(name, session_url, session_id));
+    }
+
+    
+    socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}") ;
+    socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
   });
 
   socket.on("UserForm", (data) => {
     console.log("RECU User Form" + data)
-    socket.emit("receive_UserForm", "EMIT USERFORM") ;
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var title = msg.title;
+    var description = msg.description
+    socket.emit("receive_userForm", JSON.stringify({
+      "title": title,
+      "description": description
+    })) ;
+    socket.to(session_id).emit("receive_userForm", JSON.stringify({
+      "title": title,
+      "description": description
+    }));
   });
 
   socket.on("disconnect", () => {

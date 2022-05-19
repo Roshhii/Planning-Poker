@@ -80,22 +80,25 @@ function Planning_poker({ socket }) {
   var [confirmed, serConfirmed] = useState(false);
   var [others_cards, setOtherCards] = useState(null);
 
-  const [name, setName] = useState("");
   var [nameDisplay, setNameDisplay] = useState("");
-
-  const [userStoryDisplay, setuserStoryDisplay] = useState();
-  const [descriptionUserStory, setdescriptionUserStory] = useState();
 
 
   var session_id = useParams().id;
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
   var isShow = false
   const location = useLocation()
-  var { username } = location.state
+
+  username = "";
+  userStory = "";
+  var { username, userStory, tasks } = location.state
+  var [userStory, setUserStory] = useState(userStory);
+  var [tasks, setTasks] = useState(tasks);
   name_session = username
-  username = "Hello " + username + "!";
+  username = username;
   console.log("Location : " + location)
   console.log("Username : " + username)
+  console.log("UserStory : " + userStory)
+  console.log("Tasks : " + tasks)
 
   const callBackend = () => {
     socket.emit("card",
@@ -106,8 +109,18 @@ function Planning_poker({ socket }) {
       }));
   }
 
+  const callShow = () => {
+    socket.emit("show",
+     JSON.stringify({
+      "session_id": session_id
+    }));
+    console.log("Call show", Backend_response)
+
+  }
+
   useEffect(() => {
     socket.on("receive_card", (data) => {
+      console.log("Receive Card !" + data)
       setBackendResponse(data)
     });
 
@@ -123,6 +136,19 @@ function Planning_poker({ socket }) {
 
     socket.on("receive_UserForm", (data) => {
       console.log("USER Form recu du backend" + data);
+    });
+
+    socket.on("receive_show", (data) => {
+      console.log("Receive Show " +  data);
+      
+      handleShow(data);
+    });
+
+    socket.on("receive_userForm", (data) => {
+      console.log("Receive UserForm " + data);
+      var msg = JSON.parse(data)
+      setUserStory(msg.title);
+      setTasks(msg.description);
     });
   }, [socket])
 
@@ -184,18 +210,18 @@ function Planning_poker({ socket }) {
     );
   }
 
-  function handleShowClick() {
+  function handleShow(data) {
     if (isShow) {
       isShow = false
     }
     else {
       isShow = true
     }
-    console.log(JSON.parse(Backend_response));
+    console.log(JSON.parse(data));
 
-    console.log("Backend_response : " + Backend_response)
+    console.log("Backend_response : " + data)
     //var users = JSON.parse(Backend_response)
-    var users = JSON.parse(Backend_response)['Users'];
+    var users = JSON.parse(data)['Users'];
 
     var usersCards = [];
     for (var user in users) {
@@ -215,7 +241,7 @@ function Planning_poker({ socket }) {
     return (
       <Show
         value={<div>Show</div>}
-        onClick={() => handleShowClick()}
+        onClick={() => callShow()}
       />)
   }
 
@@ -251,12 +277,13 @@ function Planning_poker({ socket }) {
   return (
     <div class="main">
       <div><h2 className="id">Session Id : {session_id}</h2></div>
-      <h2>{username}</h2>
-      <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`}>
+      <h2>Hello {username} !</h2>
+      <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`} state={{username : username, userStory : userStory, tasks :  tasks}}>
           -- Open User Story --
       </NavLink>
-      <p>{userStoryDisplay}</p>
-      {descriptionUserStory}
+      <p><strong>User Story :</strong> {userStory}</p>
+      <p><strong>Tasks :</strong> {tasks}</p>
+      
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>
         <div class="child">{renderSquare(1)}</div>
