@@ -42,7 +42,7 @@ function UserStory( {socket} ) {
     
                 <input
                     type="text"
-                    placeholder="Enter a Title"
+                    placeholder="Enter a User Story"
                     value={title}
                     onChange={handleChangeTitle}
                 />
@@ -53,7 +53,7 @@ function UserStory( {socket} ) {
     
                 <input
                     type="text"
-                    placeholder="Enter Description"
+                    placeholder="Enter Tasks"
                     value={description}
                     onChange={handleChangeDescription}
                 />
@@ -132,8 +132,8 @@ function UserStory( {socket} ) {
                 <div><h2 className="id">Session Id : {param.id}</h2></div>
                 <div><UserStoryForm /></div>
                 <div><JiraImport/></div>
-                <p>Title : {titleUserStory}</p>
-                <p>Description : {descriptionUserStory}</p>
+                <p>User Story : {titleUserStory}</p>
+                <p>Tasks : {descriptionUserStory}</p>
                 <button className="button" onClick={handleClick}>Confirm</button>
                 <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`}>
                     -- Back to Planning Poker --
