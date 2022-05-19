@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams, NavLink } from "react-router-dom"
+import { useParams, NavLink, useLocation } from "react-router-dom"
 
 
 var name_session;
@@ -110,6 +110,12 @@ function Planning_poker({ socket }) {
   var session_id = useParams().id;
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
   var isShow = false
+  const location = useLocation()
+  var { username } = location.state
+  name_session = username
+  username = "Hello " + username + "!";
+  console.log("Location : " + location)
+  console.log("Username : " + username)
 
   const callBackend = () => {
     socket.emit("card",
@@ -182,8 +188,7 @@ function Planning_poker({ socket }) {
   }
 
   function handleConfirmClick() {
-    if (name_session == null) { alert('Please enter your name to confirm'); }
-    else if (selectedCard != null && !confirmed) {
+    if (selectedCard != null && !confirmed) {
       serConfirmed(true)
       document.getElementById("selected-card").style.backgroundColor = "#4CAF50"
       callBackend()
@@ -238,7 +243,7 @@ function Planning_poker({ socket }) {
   return (
     <div class="main">
       <div><h2 className="id">Session Id : {session_id}</h2></div>
-      <h2>{name_session}</h2>
+      <h2>{username}</h2>
       <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`}>
           -- Open User Story --
       </NavLink>
