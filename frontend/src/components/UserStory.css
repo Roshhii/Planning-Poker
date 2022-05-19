@@ -31,3 +31,13 @@
     box-shadow: 0 5px #666;
     transform: translateY(4px);
   }
+
+  .first-line {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #nav-link-Planning {
+    margin-top: 15px;
+    margin-right: 20px;
+  }
