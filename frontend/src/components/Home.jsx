@@ -47,6 +47,10 @@ function Home({ socket }) {
 
     const handleSubmit = (evt) => {
       evt.preventDefault();
+      socket.emit("user", JSON.stringify({
+        "username": name_session,
+        "session_id": id
+      }));
       setSessionId(id)
 
       document.getElementById("nav-link-Planning").style.display = "block"
@@ -79,19 +83,14 @@ function Home({ socket }) {
     socket.emit("key", "I want a key!");
   }
 
-
-
-  const sendInfoUser = () => {
-    socket.emit("user", JSON.stringify({
-      "username": name_session,
-      "session_id": session_id
-    }));
-  }
-
   useEffect(() => {
     socket.on("receive_key", (data) => {
       console.log("Data : ", data);
       setSessionId(data);
+      socket.emit("user", JSON.stringify({
+        "username": name_session,
+        "session_id": data
+      }));
       document.getElementById("nav-link-Planning").style.display = "block"
       document.getElementById("session-key").style.display = "block"
       document.getElementById("send-button").style.display = "inline-block"
@@ -109,7 +108,6 @@ function Home({ socket }) {
         <p>OR</p>
         <button onClick={sendKey} class="button">Generate Key</button>
         <p class="session-key" id="session-key">Your Session Key : {session_id}</p>
-        <button onClick={sendInfoUser} id="send-button" class="send-button">Send Info User</button>
         {/* <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/planning_poker/${session_id}`}>
           -- Start the session --
         </NavLink> */}
