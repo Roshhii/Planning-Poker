@@ -61,34 +61,14 @@ function Show(props) {
   );
 }
 
-function NameForm() {
-
-  const [name, setName] = useState("");
-  const [nameDisplay, setNameDisplay] = useState("");
-
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    name_session = name;
-    setNameDisplay(name)
-  }
-
-  const handleChange = (evt) => {
-    evt.preventDefault();
-    setName(evt.target.value)
-  }
-
+function Export(props) {
   return (
-    <form onSubmit={handleSubmit}>
-
-      <input
-        type="text"
-        placeholder="Enter a name"
-        value={name}
-        onChange={handleChange}
-      />
-      <input type="submit" value="Submit" />
-      <p>Your Name : {nameDisplay}</p>
-    </form>
+    <button
+      className="export"
+      onClick={props.onClick}
+    >
+      Export
+    </button>
   );
 }
 
@@ -104,7 +84,7 @@ function Planning_poker({ socket }) {
   var [nameDisplay, setNameDisplay] = useState("");
 
   const [userStoryDisplay, setuserStoryDisplay] = useState();
-  const [descriptionUserStory, setdescriptionUserStory]  = useState();
+  const [descriptionUserStory, setdescriptionUserStory] = useState();
 
 
   var session_id = useParams().id;
@@ -142,7 +122,7 @@ function Planning_poker({ socket }) {
     });
 
     socket.on("receive_UserForm", (data) => {
-      console.log("USER Form recu du backend"+data);
+      console.log("USER Form recu du backend" + data);
     });
   }, [socket])
 
@@ -238,7 +218,35 @@ function Planning_poker({ socket }) {
         onClick={() => handleShowClick()}
       />)
   }
-  
+
+  function handleExportClick() {
+
+    const rows = [
+      ["IssueType", "Summary", "Description"],
+      ["Story", "User Story", "Tasks and estimations"]
+    ];
+
+    let csvContent = "data:text/csv;charset=utf-8,"
+      + rows.map(e => e.join(",")).join("\n");
+
+    //download
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "result.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click(); // This will download the data file named "result.csv".
+  }
+
+  function renderExport() {
+    return (
+      <Export
+        value={<div>Export</div>}
+        onClick={() => handleExportClick()}
+      />)
+  }
+
 
   return (
     <div class="main">
@@ -271,6 +279,7 @@ function Planning_poker({ socket }) {
       </div>
       <div className="board-row">
         <div>{renderShow()}</div>
+        <div>{renderExport()}</div>
       </div>
     </div>
   );
