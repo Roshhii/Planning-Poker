@@ -247,9 +247,17 @@ function Planning_poker({ socket }) {
 
   function handleExportClick() {
 
+    var estimations = "";
+
+    var users = JSON.parse(Backend_response)['Users'];
+    for (var user in users) {
+      estimations += users[user]['name'] + " : "
+      estimations +=users[user]['card'] +  "    ";
+    }
+
     const rows = [
       ["IssueType", "Summary", "Description"],
-      ["Story", "User Story", "Tasks and estimations"]
+      ["Story", userStory, tasks + "    " + estimations]
     ];
 
     let csvContent = "data:text/csv;charset=utf-8,"
