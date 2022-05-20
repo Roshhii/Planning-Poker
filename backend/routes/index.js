@@ -32,6 +32,8 @@ function makeid(length) {
 }
 
 var session_url = {}
+var length_sessions = {}
+var creator_session = {}
 
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -49,12 +51,20 @@ io.on('connection', (socket) => {
     infoUser.set(msg.username, msg.session_id)
     console.log("Username : " + (msg.username))
     console.log("Session_id : " + msg.session_id)
+    if (!length_sessions.hasOwnProperty(msg.session_id)) {
+      length_sessions[msg.session_id] = 1;
+      creator_session[msg.session_id] = socket.id;
+    }
+    else {
+      length_sessions[msg.session_id] += 1;
+    }
+    console.log(length_sessions[msg.session_id])
+
     socket.emit("receive_user", JSON.stringify({
       "username": msg.username,
       "session_id": msg.session_id
     }))
   })
-
 
   socket.on("card", (data) => {
     console.log("Card event received : " + data);
@@ -62,29 +72,47 @@ io.on('connection', (socket) => {
     var session_id = msg.session_id
     var name_session = msg.name_session
     var card = msg.card
-    
+
     if (!session_url.hasOwnProperty(session_id)) {
       session_url[session_id] = {};
     }
-  
+
     session_url[session_id][name_session] = parseInt(card);
-  
-  
+
+
     var all_cards = []
     message = []
-  
+
     for (var name in session_url[session_id]) {
-  
+
       message.push(makeElementJSON(name, session_url, session_id));
-  
+
       all_cards.push(session_url[session_id][name]);
     }
 
     console.log("Message : " + message)
     console.log("Message event card all users : " + '{"Users" : ' + JSON.stringify(message) + "}")
-    socket.emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}") ;
-    socket.to(session_id).emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}");
 
+    if (length_sessions[session_id] == Object.keys(session_url[session_id]).length) {
+      socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
+      socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
+    }
+    else {
+      socket.emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}");
+      socket.to(session_id).emit("receive_card", '{"Users" : ' + JSON.stringify(message) + "}");
+    }
+  });
+
+  socket.on("reset", (data) => {
+    console.log(`Message from user with ID RESET: ${socket.id}: ${data}`)
+    var msg = JSON.parse(data);
+    console.log(session_url[msg.session_id])
+    if(session_url[msg.session_id].hasOwnProperty(msg.name_session)) {
+      delete session_url[msg.session_id][msg.name_session];
+    }
+    console.log(session_url[msg.session_id])
+    socket.emit("receive_reset", 'The card has been reset');
+    socket.to(msg.session_id).emit("receive_reset", 'The card has been reset');
   });
 
   socket.on("show", (data) => {
@@ -92,14 +120,19 @@ io.on('connection', (socket) => {
     var msg = JSON.parse(data);
     var session_id = msg.session_id
 
-    message = []
-    for (var name in session_url[session_id]) {
-      message.push(makeElementJSON(name, session_url, session_id));
+    if (creator_session[msg.session_id] == socket.id) {
+      message = []
+      for (var name in session_url[session_id]) {
+        message.push(makeElementJSON(name, session_url, session_id));
+      }
+
+      socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
+      socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
+    }
+    else {
+      socket.emit("receive_no_show", 'Not the creator');
     }
 
-    
-    socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}") ;
-    socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
   });
 
   socket.on("UserForm", (data) => {
@@ -111,7 +144,7 @@ io.on('connection', (socket) => {
     socket.emit("receive_userForm", JSON.stringify({
       "title": title,
       "description": description
-    })) ;
+    }));
     socket.to(session_id).emit("receive_userForm", JSON.stringify({
       "title": title,
       "description": description
