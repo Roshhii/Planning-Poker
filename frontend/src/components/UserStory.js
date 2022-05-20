@@ -3,7 +3,7 @@ import { useParams, NavLink, useLocation } from "react-router-dom"
 import './UserStory.css';
 
 
-function UserStory( {socket} ) {
+function UserStory({ socket }) {
 
     const location = useLocation()
     var { username, userStory, tasks } = location.state
@@ -12,7 +12,7 @@ function UserStory( {socket} ) {
 
     const param = useParams();
     const [titleUserStory, setTitleUserStoryy] = useState(userStory);
-    const [descriptionUserStory, setDescriptionUserStory]  = useState(tasks);
+    const [descriptionUserStory, setDescriptionUserStory] = useState(tasks);
 
     function UserStoryForm() {
 
@@ -130,8 +130,8 @@ function UserStory( {socket} ) {
         <div className="UserStory">
             <div class="container">
                 <div class="first-line">
-                    <h2 className="id">Session Id : {param.id}</h2>
-                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`}>
+                    <h3 className="id">Session Id : {param.id}</h3>
+                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username, userStory: titleUserStory, tasks: descriptionUserStory }}>
                         -- Back to Planning Poker --
                     </NavLink>
                 </div>
@@ -141,9 +141,6 @@ function UserStory( {socket} ) {
                 <p>User Story : {titleUserStory}</p>
                 <p>Tasks : {descriptionUserStory}</p>
                 <button className="button" onClick={handleClick}>Confirm</button>
-                <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username : username, userStory: titleUserStory, tasks :  descriptionUserStory}}>
-                    -- Back to Planning Poker --
-                </NavLink>
             </div>
         </div>
     );
