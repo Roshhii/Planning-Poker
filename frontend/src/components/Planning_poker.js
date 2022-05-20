@@ -150,6 +150,11 @@ function Planning_poker({ socket }) {
       setUserStory(msg.title);
       setTasks(msg.description);
     });
+
+    socket.on("receive_reset", (data) => {
+      console.log("Receive Reset " + data);
+      setOtherCards(null);
+    });
   }, [socket])
 
   function handleCardClick(i) {
@@ -176,6 +181,12 @@ function Planning_poker({ socket }) {
   }
 
   function handleResetClick() {
+    socket.emit("reset",
+      JSON.stringify({
+        "session_id": session_id,
+        "name_session": name_session,
+        "card": selectedCard
+      }));
     setSelectedCard(null)
     setBackendResponse(null)
     serConfirmed(false)
