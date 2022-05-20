@@ -278,7 +278,7 @@ function Planning_poker({ socket }) {
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "result.csv");
+    link.setAttribute("download", `results_session-${session_id}.csv`);
     document.body.appendChild(link); // Required for FF
 
     link.click(); // This will download the data file named "result.csv".
@@ -295,7 +295,7 @@ function Planning_poker({ socket }) {
 
   return (
     <div class="main">
-      <div><h2 className="id">Session Id : {session_id}</h2></div>
+      <h3 className="id">Session Id : {session_id}</h3>
       <h2>Hello {username} !</h2>
       <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`} state={{username : username, userStory : userStory, tasks :  tasks}}>
           -- Open User Story --
@@ -323,7 +323,7 @@ function Planning_poker({ socket }) {
         <div class="grid-child">{renderSelectedCard()}</div>
         {others_cards}
       </div>
-      <div className="board-row">
+      <div className="show-export-row">
         <div>{renderShow()}</div>
         <div>{renderExport()}</div>
       </div>
