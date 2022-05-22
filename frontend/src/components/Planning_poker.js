@@ -142,6 +142,7 @@ function Planning_poker({ socket }) {
       console.log("Receive Show " +  data);
       
       handleShow(data);
+      setBackendResponse(data)
     });
 
     socket.on("receive_userForm", (data) => {
@@ -261,6 +262,7 @@ function Planning_poker({ socket }) {
     var estimations = "";
 
     var users = JSON.parse(Backend_response)['Users'];
+    console.log(Backend_response)
     for (var user in users) {
       estimations += users[user]['name'] + " : "
       estimations +=users[user]['card'] +  "    ";
