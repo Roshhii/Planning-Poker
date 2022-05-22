@@ -1,92 +1,33 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import * as serviceWorker from "./serviceWorker";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Navigate  } from "react-router-dom";
+import {
+  Navigation,
+  Home,
+  Planning_poker,
+  UserStory
+} from "./components";
+import io from 'socket.io-client'
 
-function Card(props){
-      return (
-        <button 
-          className="card"
-          onClick={props.onClick}
-        >
-          {props.value}
-        </button>
-      );
-    }
+const socket = io.connect("http://localhost:3001")
 
-    function SelectedCard(props){
-      return (
-        <button
-          className="card"
-        >
-          {props.value}
-        </button>
-      );
-    }
-  
-  class Board extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = {
-            squares: [0,1,2,3,5,8,13,20,40,100],
-            selectedCard: null,
-        };
-        
-    }
 
-    handleClick(i){
+ReactDOM.render(
+  <Router>
+    <Navigation />
+    <Routes>
+      <Route exact path="/" element={<Home socket={socket}/>}/>
+      {/* <Route path="/" element={<Home socket={socket} />} /> */}
+      <Route path="/planning_poker/:id" element={<Planning_poker socket={socket} animate={true} />} />
+      <Route path="/userStory/:id" element={<UserStory socket={socket} animate={true} />} />
+    </Routes>
+  </Router>,
 
-        this.setState({
-            squares: this.state.squares,
-            selectedCard: this.state.squares[i],
-        });
-    }
+  document.getElementById("root")
+);
 
-    renderSquare(i) {
-      return (
-          <Card 
-              value={this.state.squares[i]}
-              onClick={() => this.handleClick(i)}
-          />
-      );
-    }
 
-    renderSelectedCard(){
-      return (
-        <SelectedCard 
-            value={this.state.selectedCard}
-        />
-      );
-    }
-  
-    render() {
-      
-      return (
-        <div>
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-            {this.renderSquare(9)}
-          </div>
-          <div className="board-row">
-            {<h1>Selected Card :</h1>}
-            {this.renderSelectedCard()}
-          </div>
-        </div>
-      );
-    }
-  }
-  
-  // ========================================
-  
-  ReactDOM.render(
-    <Board />,
-    document.getElementById('root')
-  );
-  
+serviceWorker.unregister();
