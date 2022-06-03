@@ -108,7 +108,7 @@ function Home({ socket }) {
         <p>OR</p>
         <button onClick={sendKey} class="button">Generate Key</button>
         <p class="session-key" id="session-key">Your Session Key : {session_id}</p>
-        <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/planning_poker/${session_id}`} state={{ username: name_session }} >
+        <NavLink id="nav-link-Planning" className="nav-link-Planning" to={`/planning_poker/${session_id}`} state={{ username: name_session, nb_userStory: 0 }} >
           -- Start the session --
         </NavLink>
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams, NavLink, useLocation } from "react-router-dom"
+import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 
 var name_session;
@@ -72,25 +72,24 @@ function Export(props) {
   );
 }
 
+function UserStory(props) {
+  return (
+    <button
+      className="card"
+      onClick={props.onClick}
+    >
+      {props.value}
+    </button>
+  );
+}
+
 
 function Planning_poker({ socket }) {
 
-  var [selectedCard, setSelectedCard] = useState(null);
-  var [Backend_response, setBackendResponse] = useState(null);
-  var [confirmed, serConfirmed] = useState(false);
-  var [others_cards, setOtherCards] = useState(null);
-
-  var [nameDisplay, setNameDisplay] = useState("");
-
-
-  var session_id = useParams().id;
-  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
-  var isShow = false
   const location = useLocation()
 
-  username = "";
-  userStory = "";
-  var { username, userStory, tasks } = location.state
+  var { username, userStory, tasks, nb_userStory } = location.state
+  var [nb_userStory, setNBUserStory] = useState(nb_userStory);
   var [userStory, setUserStory] = useState(userStory);
   var [tasks, setTasks] = useState(tasks);
   name_session = username
@@ -99,6 +98,42 @@ function Planning_poker({ socket }) {
   console.log("Username : " + username)
   console.log("UserStory : " + userStory)
   console.log("Tasks : " + tasks)
+
+  var session_id = useParams().id;
+  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  var isShow = false
+
+  username = "";
+  userStory = "";
+
+  console.log("Initialisation : Nb User Stories : "+ nb_userStory)
+
+  var list_userStoryDisplay = []
+  if (nb_userStory == 0){
+    list_userStoryDisplay = null;
+  }
+  else{
+    for (var i=0; i<nb_userStory; i++){
+      let value = i+1
+      list_userStoryDisplay.push(<UserStory
+        value={value}
+        onClick={() => handleUserStoryClick(value)}
+      />);
+    }
+    list_userStoryDisplay = <div class="grid-child">{list_userStoryDisplay} </div>
+  }
+  
+  
+
+  var [userStorys, setUserStorys] = useState(null);
+  var [userStorysDisplay, setUserStorysDisplay] = useState(list_userStoryDisplay);
+  var [selectedCard, setSelectedCard] = useState(null);
+  var [Backend_response, setBackendResponse] = useState(null);
+  var [confirmed, serConfirmed] = useState(false);
+  var [others_cards, setOtherCards] = useState(null);
+
+  var [nameDisplay, setNameDisplay] = useState("");
+
 
   const callBackend = () => {
     socket.emit("card",
@@ -111,9 +146,9 @@ function Planning_poker({ socket }) {
 
   const callShow = () => {
     socket.emit("show",
-     JSON.stringify({
-      "session_id": session_id
-    }));
+      JSON.stringify({
+        "session_id": session_id
+      }));
     console.log("Call show", Backend_response)
 
   }
@@ -134,15 +169,36 @@ function Planning_poker({ socket }) {
       session_id = msg.session_id
     });
 
-    socket.on("receive_UserForm", (data) => {
-      console.log("USER Form recu du backend" + data);
-    });
 
     socket.on("receive_show", (data) => {
-      console.log("Receive Show " +  data);
-      
+      console.log("Receive Show " + data);
+
       handleShow(data);
       setBackendResponse(data)
+    });
+
+    socket.on("receive_AddUserStory", (data) => {
+      console.log("Receive Add UserStory " + data);
+      var data = JSON.parse(data)['UserStorys']
+
+      var list_userStory = [];
+      var list_userStoryDisplay = [];
+      for (var i in data) {
+        let value = parseInt(i)+1;
+        list_userStory.push("userStory : " + data[i]["userStory"] + "\n" + "tasks : " + data[i]["tasks"]);
+        list_userStoryDisplay.push(<UserStory
+          value={value}
+          onClick={() => handleUserStoryClick(value)}
+        />);
+      }
+      setUserStorysDisplay(<div class="grid-child">{list_userStoryDisplay} </div>)
+      setUserStorys(list_userStory)
+      setNBUserStory(list_userStoryDisplay.length);
+    });
+
+    socket.on("receive_getUserStory", (data) => {
+      console.log("Receive User Story " + data);
+      var data = JSON.parse(data)
     });
 
     socket.on("receive_userForm", (data) => {
@@ -157,6 +213,18 @@ function Planning_poker({ socket }) {
       setOtherCards(null);
     });
   }, [socket])
+
+
+  function handleUserStoryClick(i) {
+    console.log("CLICK ON : " + i)
+    socket.emit("getUserStory",
+      JSON.stringify({
+        "session_id": session_id,
+        "name_session": name_session,
+        "selectedUserStory": i
+      }));
+  }
+
 
   function handleCardClick(i) {
     if (!confirmed) {
@@ -232,7 +300,7 @@ function Planning_poker({ socket }) {
     console.log(JSON.parse(data));
 
     console.log("Backend_response : " + data)
-    //var users = JSON.parse(Backend_response)
+
     var users = JSON.parse(data)['Users'];
 
     var usersCards = [];
@@ -265,7 +333,7 @@ function Planning_poker({ socket }) {
     console.log(Backend_response)
     for (var user in users) {
       estimations += users[user]['name'] + " : "
-      estimations +=users[user]['card'] +  "    ";
+      estimations += users[user]['card'] + "    ";
     }
 
     const rows = [
@@ -295,16 +363,21 @@ function Planning_poker({ socket }) {
   }
 
 
+
   return (
     <div class="main">
       <h3 className="id">Session Id : {session_id}</h3>
       <h2>Hello {username} !</h2>
-      <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`} state={{username : username, userStory : userStory, tasks :  tasks}}>
-          -- Open User Story --
+      <div><NavLink id="nav-link-Planning" to={`/UserStory/${session_id}`} state={{ username: username, msg: "add", nb_userStory: nb_userStory+1 }}>
+        Add User Story
+      </NavLink></div>
+      <div>{userStorysDisplay}</div>
+      <NavLink id="nav-link-Planning" to={`/UserStory/${session_id}`} state={{ username: username, userStory: userStory, tasks: tasks }}>
+        -- Open User Story --
       </NavLink>
       <p><strong>User Story :</strong> {userStory}</p>
       <p><strong>Tasks :</strong> {tasks}</p>
-      
+
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>
         <div class="child">{renderSquare(1)}</div>
