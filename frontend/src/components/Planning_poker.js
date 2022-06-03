@@ -75,6 +75,7 @@ function Export(props) {
 function UserStory(props) {
   return (
     <button
+      id={props.id}
       className="card"
       onClick={props.onClick}
     >
@@ -88,7 +89,11 @@ function Planning_poker({ socket }) {
 
   const location = useLocation()
 
-  var { username, userStory, tasks, nb_userStory } = location.state
+  var session_id = useParams().id;
+  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  var isShow = false
+
+  var { username, nb_userStory } = location.state
   var [nb_userStory, setNBUserStory] = useState(nb_userStory);
   var [userStory, setUserStory] = useState(userStory);
   var [tasks, setTasks] = useState(tasks);
@@ -99,12 +104,7 @@ function Planning_poker({ socket }) {
   console.log("UserStory : " + userStory)
   console.log("Tasks : " + tasks)
 
-  var session_id = useParams().id;
-  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
-  var isShow = false
-
-  username = "";
-  userStory = "";
+  
 
   console.log("Initialisation : Nb User Stories : "+ nb_userStory)
 
@@ -116,6 +116,7 @@ function Planning_poker({ socket }) {
     for (var i=0; i<nb_userStory; i++){
       let value = i+1
       list_userStoryDisplay.push(<UserStory
+        id={"userCard"+value}
         value={value}
         onClick={() => handleUserStoryClick(value)}
       />);
@@ -187,6 +188,7 @@ function Planning_poker({ socket }) {
         let value = parseInt(i)+1;
         list_userStory.push("userStory : " + data[i]["userStory"] + "\n" + "tasks : " + data[i]["tasks"]);
         list_userStoryDisplay.push(<UserStory
+          id={"userCard"+value}
           value={value}
           onClick={() => handleUserStoryClick(value)}
         />);
@@ -198,14 +200,9 @@ function Planning_poker({ socket }) {
 
     socket.on("receive_getUserStory", (data) => {
       console.log("Receive User Story " + data);
-      var data = JSON.parse(data)
-    });
-
-    socket.on("receive_userForm", (data) => {
-      console.log("Receive UserForm " + data);
       var msg = JSON.parse(data)
-      setUserStory(msg.title);
-      setTasks(msg.description);
+      setUserStory(msg.userStory);
+      setTasks(msg.tasks);
     });
 
     socket.on("receive_reset", (data) => {
@@ -217,12 +214,14 @@ function Planning_poker({ socket }) {
 
   function handleUserStoryClick(i) {
     console.log("CLICK ON : " + i)
+    document.getElementById("userCard"+i).style.backgroundColor = "#4CAF50";
     socket.emit("getUserStory",
       JSON.stringify({
         "session_id": session_id,
         "name_session": name_session,
         "selectedUserStory": i
       }));
+    
   }
 
 
@@ -372,9 +371,6 @@ function Planning_poker({ socket }) {
         Add User Story
       </NavLink></div>
       <div>{userStorysDisplay}</div>
-      <NavLink id="nav-link-Planning" to={`/UserStory/${session_id}`} state={{ username: username, userStory: userStory, tasks: tasks }}>
-        -- Open User Story --
-      </NavLink>
       <p><strong>User Story :</strong> {userStory}</p>
       <p><strong>Tasks :</strong> {tasks}</p>
 

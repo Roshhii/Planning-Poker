@@ -167,22 +167,6 @@ io.on('connection', (socket) => {
     socket.emit("receive_getUserStory", JSON.stringify(message));
   });
 
-  socket.on("UserForm", (data) => {
-    console.log("RECU User Form" + data)
-    var msg = JSON.parse(data);
-    var session_id = msg.session_id
-    var title = msg.title;
-    var description = msg.description
-    socket.emit("receive_userForm", JSON.stringify({
-      "title": title,
-      "description": description
-    }));
-    socket.to(session_id).emit("receive_userForm", JSON.stringify({
-      "title": title,
-      "description": description
-    }));
-  });
-
   socket.on("disconnect", () => {
     console.log("User Diconnected", socket.id);
   });
