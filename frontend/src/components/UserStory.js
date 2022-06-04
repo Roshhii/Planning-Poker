@@ -6,13 +6,14 @@ import './UserStory.css';
 function UserStory({ socket }) {
 
     const location = useLocation()
-    var { username, msg, nb_userStory } = location.state
-    console.log("Nb User Storys : " + nb_userStory)
+    var { username, msg, selectedUserStory, title, description } = location.state
+    console.log("Nb User Storys : " + selectedUserStory)
     console.log("username : ", username)
+    console.log("Title UserStory : " + title)
 
     const param = useParams();
-    const [titleUserStory, setTitleUserStoryy] = useState(null);
-    const [descriptionUserStory, setDescriptionUserStory] = useState(null);
+    const [titleUserStory, setTitleUserStoryy] = useState(title);
+    const [descriptionUserStory, setDescriptionUserStory] = useState(description);
 
     function UserStoryForm() {
 
@@ -127,6 +128,16 @@ function UserStory({ socket }) {
                 "description": descriptionUserStory
             }));
         }
+
+        if (msg == "update"){
+            socket.emit("UpdateUserStory",
+            JSON.stringify({
+                "session_id": param.id,
+                "selectedUserStory" : selectedUserStory,
+                "title": titleUserStory,
+                "description": descriptionUserStory
+            }));
+        }
         
         
 
@@ -144,7 +155,7 @@ function UserStory({ socket }) {
             <div class="container">
                 <div class="first-line">
                     <h3 className="id">Session Id : {param.id}</h3>
-                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username, nb_userStory: nb_userStory }}>
+                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username }}>
                         -- Back to Planning Poker --
                     </NavLink>
                 </div>

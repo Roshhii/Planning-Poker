@@ -3,6 +3,8 @@ import './Planning_poker.css';
 import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 
+
+
 var name_session;
 
 
@@ -93,10 +95,15 @@ function Planning_poker({ socket }) {
   var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
   var isShow = false
 
-  var { username, nb_userStory } = location.state
-  var [nb_userStory, setNBUserStory] = useState(nb_userStory);
+
+
+  var { username } = location.state
+
+  var [nb_userStory, setNBUserStory] = useState(0);
   var [userStory, setUserStory] = useState(userStory);
   var [tasks, setTasks] = useState(tasks);
+  var [selectedUserStory, setSelectedUserStory] = useState(null);
+
   name_session = username
   username = username;
   console.log("Location : " + location)
@@ -104,27 +111,29 @@ function Planning_poker({ socket }) {
   console.log("UserStory : " + userStory)
   console.log("Tasks : " + tasks)
 
-  
 
-  console.log("Initialisation : Nb User Stories : "+ nb_userStory)
+  console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
+  console.log("Session before Parse JSON : " + window.localStorage.getItem('session_id'))
 
   var list_userStoryDisplay = []
-  if (nb_userStory == 0){
-    list_userStoryDisplay = null;
-  }
-  else{
-    for (var i=0; i<nb_userStory; i++){
-      let value = i+1
+  if (session_id == window.localStorage.getItem('session_id')) {
+    nb_userStory = window.localStorage.getItem('nb_userStory')
+
+    for (var i = 0; i < nb_userStory; i++) {
+      let value = i + 1
       list_userStoryDisplay.push(<UserStory
-        id={"userCard"+value}
+        id={"userCard" + value}
         value={value}
         onClick={() => handleUserStoryClick(value)}
       />);
     }
     list_userStoryDisplay = <div class="grid-child">{list_userStoryDisplay} </div>
   }
-  
-  
+  else {
+    list_userStoryDisplay = null;
+  }
+
+
 
   var [userStorys, setUserStorys] = useState(null);
   var [userStorysDisplay, setUserStorysDisplay] = useState(list_userStoryDisplay);
@@ -155,6 +164,10 @@ function Planning_poker({ socket }) {
   }
 
   useEffect(() => {
+
+    setNBUserStory(window.localStorage.getItem('nb_userStory'));
+
+
     socket.on("receive_card", (data) => {
       console.log("Receive Card !" + data)
       setBackendResponse(data)
@@ -184,18 +197,25 @@ function Planning_poker({ socket }) {
 
       var list_userStory = [];
       var list_userStoryDisplay = [];
+
       for (var i in data) {
-        let value = parseInt(i)+1;
+        let value = parseInt(i) + 1;
         list_userStory.push("userStory : " + data[i]["userStory"] + "\n" + "tasks : " + data[i]["tasks"]);
         list_userStoryDisplay.push(<UserStory
-          id={"userCard"+value}
+          id={"userCard" + value}
           value={value}
           onClick={() => handleUserStoryClick(value)}
         />);
       }
       setUserStorysDisplay(<div class="grid-child">{list_userStoryDisplay} </div>)
       setUserStorys(list_userStory)
-      setNBUserStory(list_userStoryDisplay.length);
+      nb_userStory = list_userStoryDisplay.length;
+
+      console.log("Before storage : " + session_id)
+      window.localStorage.setItem("session_id", session_id)
+      window.localStorage.setItem('nb_userStory', list_userStoryDisplay.length)
+
+      console.log("NB User Story Add  : " + list_userStoryDisplay.length)
     });
 
     socket.on("receive_getUserStory", (data) => {
@@ -214,14 +234,26 @@ function Planning_poker({ socket }) {
 
   function handleUserStoryClick(i) {
     console.log("CLICK ON : " + i)
-    document.getElementById("userCard"+i).style.backgroundColor = "#4CAF50";
+    setSelectedUserStory(i)
+    document.getElementById("removeUserStory").style.display = "inline-block"
+    document.getElementById("nav-link-UpdateUserStory").style.display = "inline-block"
+
+    for (var k = 1; k <= nb_userStory; k++) {
+      console.log("NB User Stories : " + nb_userStory + "   k : " + k)
+      if (k == i) {
+        document.getElementById("userCard" + k).style.backgroundColor = "#4CAF50";
+      }
+      else {
+        document.getElementById("userCard" + k).style.backgroundColor = "white";
+      }
+    }
     socket.emit("getUserStory",
       JSON.stringify({
         "session_id": session_id,
         "name_session": name_session,
         "selectedUserStory": i
       }));
-    
+
   }
 
 
@@ -261,6 +293,7 @@ function Planning_poker({ socket }) {
     isShow = false
     setOtherCards(null)
     document.getElementById("selected-card").style.backgroundColor = "#FCFCFD"
+
   }
 
   function renderReset() {
@@ -361,16 +394,38 @@ function Planning_poker({ socket }) {
       />)
   }
 
+  function removeUserStory() {
+    console.log("Remove : " + selectedUserStory)
+    socket.emit("removeUserStory",
+      JSON.stringify({
+        "session_id": session_id,
+        "name_session": name_session,
+        "selectedUserStory": selectedUserStory
+      }));
+    document.getElementById("removeUserStory").style.display = "none"
+    document.getElementById("nav-link-UpdateUserStory").style.display = "none"
+
+    for (var k = 1; k <= nb_userStory; k++) {
+      document.getElementById("userCard" + k).style.backgroundColor = "white";
+    }
+    setUserStory(null);
+    setTasks(null);
+  }
+
 
 
   return (
     <div class="main">
       <h3 className="id">Session Id : {session_id}</h3>
       <h2>Hello {username} !</h2>
-      <div><NavLink id="nav-link-Planning" to={`/UserStory/${session_id}`} state={{ username: username, msg: "add", nb_userStory: nb_userStory+1 }}>
+      <div><NavLink id="nav-link-AddUserStory" className="nav-link-AddUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "add", selectedUserStory: nb_userStory + 1, title: "", description : "" }}>
         Add User Story
       </NavLink></div>
       <div>{userStorysDisplay}</div>
+      <div><button onClick={removeUserStory} class="removeUserStory" id="removeUserStory">Remove User Story</button>
+      <NavLink id="nav-link-UpdateUserStory" className="removeUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "update", selectedUserStory: selectedUserStory, title: userStory, description : tasks }}>
+        Update User Story
+      </NavLink></div>
       <p><strong>User Story :</strong> {userStory}</p>
       <p><strong>Tasks :</strong> {tasks}</p>
 
