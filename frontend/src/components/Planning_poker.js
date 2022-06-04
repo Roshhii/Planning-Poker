@@ -114,10 +114,14 @@ function Planning_poker({ socket }) {
 
   console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
   console.log("Session before Parse JSON : " + window.localStorage.getItem('session_id'))
+  console.log("Initialisation : User Stories : " + window.localStorage.getItem('userStories') + "  " + (typeof window.localStorage.getItem('userStories')))
+
+  var userStory_storage = null
 
   var list_userStoryDisplay = []
   if (session_id == window.localStorage.getItem('session_id')) {
     nb_userStory = window.localStorage.getItem('nb_userStory')
+    userStory_storage = window.localStorage.getItem('userStories')
 
     for (var i = 0; i < nb_userStory; i++) {
       let value = i + 1
@@ -135,7 +139,9 @@ function Planning_poker({ socket }) {
 
 
 
-  var [userStorys, setUserStorys] = useState(null);
+
+
+  var [userStories, setUserStorys] = useState(userStory_storage);
   var [userStorysDisplay, setUserStorysDisplay] = useState(list_userStoryDisplay);
   var [selectedCard, setSelectedCard] = useState(null);
   var [Backend_response, setBackendResponse] = useState(null);
@@ -174,7 +180,6 @@ function Planning_poker({ socket }) {
     });
 
     socket.on("receive_user", (data) => {
-      console.log("INFO RECUUUU")
       var msg = JSON.parse(data)
       console.log("Username : " + msg.username)
       name_session = msg.username
@@ -193,14 +198,14 @@ function Planning_poker({ socket }) {
 
     socket.on("receive_AddUserStory", (data) => {
       console.log("Receive Add UserStory " + data);
-      var data = JSON.parse(data)['UserStorys']
+      window.localStorage.setItem('userStories', data)
+      setUserStorys(data)
+      var data = JSON.parse(data)['UserStories']
 
-      var list_userStory = [];
       var list_userStoryDisplay = [];
 
       for (var i in data) {
         let value = parseInt(i) + 1;
-        list_userStory.push("userStory : " + data[i]["userStory"] + "\n" + "tasks : " + data[i]["tasks"]);
         list_userStoryDisplay.push(<UserStory
           id={"userCard" + value}
           value={value}
@@ -208,14 +213,13 @@ function Planning_poker({ socket }) {
         />);
       }
       setUserStorysDisplay(<div class="grid-child">{list_userStoryDisplay} </div>)
-      setUserStorys(list_userStory)
+      
       nb_userStory = list_userStoryDisplay.length;
 
       console.log("Before storage : " + session_id)
       window.localStorage.setItem("session_id", session_id)
       window.localStorage.setItem('nb_userStory', list_userStoryDisplay.length)
-
-      console.log("NB User Story Add  : " + list_userStoryDisplay.length)
+      
     });
 
     socket.on("receive_getUserStory", (data) => {
@@ -329,9 +333,6 @@ function Planning_poker({ socket }) {
     else {
       isShow = true
     }
-    console.log(JSON.parse(data));
-
-    console.log("Backend_response : " + data)
 
     var users = JSON.parse(data)['Users'];
 
@@ -359,6 +360,8 @@ function Planning_poker({ socket }) {
 
   function handleExportClick() {
 
+    console.log("Users Stories JIRA EXPORT : " + userStories)
+
     var estimations = "";
 
     var users = JSON.parse(Backend_response)['Users'];
@@ -368,10 +371,11 @@ function Planning_poker({ socket }) {
       estimations += users[user]['card'] + "    ";
     }
 
-    const rows = [
-      ["IssueType", "Summary", "Description"],
-      ["Story", userStory, tasks + "    " + estimations]
-    ];
+    const rows = [["IssueType", "Summary", "Description"]];
+
+    for (var us of JSON.parse(userStories)['UserStories']){
+      rows.push(["Story", us["userStory"], us["tasks"] + "    " + estimations])
+    }
 
     let csvContent = "data:text/csv;charset=utf-8,"
       + rows.map(e => e.join(",")).join("\n");
