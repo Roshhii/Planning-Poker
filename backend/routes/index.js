@@ -34,6 +34,7 @@ function makeid(length) {
 var session_url = {}
 var length_sessions = {}
 var creator_session = {}
+var UserStory_sessions = {}
 
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -107,7 +108,7 @@ io.on('connection', (socket) => {
     console.log(`Message from user with ID RESET: ${socket.id}: ${data}`)
     var msg = JSON.parse(data);
     console.log(session_url[msg.session_id])
-    if(session_url[msg.session_id].hasOwnProperty(msg.name_session)) {
+    if (session_url[msg.session_id].hasOwnProperty(msg.name_session)) {
       delete session_url[msg.session_id][msg.name_session];
     }
     console.log(session_url[msg.session_id])
@@ -135,20 +136,66 @@ io.on('connection', (socket) => {
 
   });
 
-  socket.on("UserForm", (data) => {
-    console.log("RECU User Form" + data)
+  socket.on("AddUserStory", (data) => {
+    console.log("Add User Story"+ data)
     var msg = JSON.parse(data);
     var session_id = msg.session_id
     var title = msg.title;
     var description = msg.description
-    socket.emit("receive_userForm", JSON.stringify({
-      "title": title,
-      "description": description
-    }));
-    socket.to(session_id).emit("receive_userForm", JSON.stringify({
-      "title": title,
-      "description": description
-    }));
+
+    if (UserStory_sessions.hasOwnProperty(session_id)) {
+      UserStory_sessions[session_id].push({"userStory" : title, "tasks" : description})
+    }
+    else {
+      UserStory_sessions[session_id] = []
+      UserStory_sessions[session_id].push({"userStory" : title, "tasks" : description})
+    }
+
+    message = UserStory_sessions[session_id]
+
+    socket.emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+    socket.to(session_id).emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+  });
+
+  socket.on("UpdateUserStory", (data) => {
+    console.log("Update User Story"+ data)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id;
+    var selectedUserStory = parseInt(msg.selectedUserStory)-1;
+    var title = msg.title;
+    var description = msg.description;
+
+    UserStory_sessions[session_id][selectedUserStory] = {"userStory" : title, "tasks" : description}
+
+    message = UserStory_sessions[session_id]
+    console.log("New User Stories : " + UserStory_sessions[session_id][selectedUserStory]);
+
+    socket.emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+    socket.to(session_id).emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+  });
+
+  socket.on("getUserStory", (data) => {
+    console.log("RECU Get User Story" + data)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var selectedUserStory = msg.selectedUserStory
+
+    message = UserStory_sessions[session_id][parseInt(selectedUserStory)-1]
+    socket.emit("receive_getUserStory", JSON.stringify(message));
+  });
+
+  socket.on("removeUserStory", (data) => {
+    console.log("RECU Remove User Story" + data)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var selectedUserStory = msg.selectedUserStory
+
+    UserStory_sessions[session_id].splice(parseInt(selectedUserStory)-1, 1)
+
+    message = UserStory_sessions[session_id]
+    console.log("New User Stories : " + UserStory_sessions[session_id]);
+    socket.emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+    socket.to(session_id).emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
   });
 
   socket.on("disconnect", () => {

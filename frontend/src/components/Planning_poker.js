@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams, NavLink, useLocation } from "react-router-dom"
+import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
+
+
 
 
 var name_session;
@@ -72,9 +74,69 @@ function Export(props) {
   );
 }
 
+function UserStory(props) {
+  return (
+    <button
+      id={props.id}
+      className="card"
+      onClick={props.onClick}
+    >
+      {props.value}
+    </button>
+  );
+}
+
 
 function Planning_poker({ socket }) {
 
+  const location = useLocation()
+
+  var session_id = useParams().id;
+  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100];
+  var isShow = false
+
+
+
+  var { username } = location.state
+
+  var [nb_userStory, setNBUserStory] = useState(0);
+  var [userStory, setUserStory] = useState(userStory);
+  var [tasks, setTasks] = useState(tasks);
+  var [selectedUserStory, setSelectedUserStory] = useState(null);
+
+  name_session = username
+  username = username;
+  console.log("Location : " + location)
+  console.log("Username : " + username)
+  console.log("UserStory : " + userStory)
+  console.log("Tasks : " + tasks)
+
+
+  console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
+  console.log("Session before Parse JSON : " + window.localStorage.getItem('session_id'))
+
+  var list_userStoryDisplay = []
+  if (session_id == window.localStorage.getItem('session_id')) {
+    nb_userStory = window.localStorage.getItem('nb_userStory')
+
+    for (var i = 0; i < nb_userStory; i++) {
+      let value = i + 1
+      list_userStoryDisplay.push(<UserStory
+        id={"userCard" + value}
+        value={value}
+        onClick={() => handleUserStoryClick(value)}
+      />);
+    }
+    list_userStoryDisplay = <div class="grid-child">{list_userStoryDisplay} </div>
+  }
+  else {
+    list_userStoryDisplay = null;
+  }
+
+
+
+  var [userStorys, setUserStorys] = useState(null);
+  var [userStorysDisplay, setUserStorysDisplay] = useState(list_userStoryDisplay);
   var [selectedCard, setSelectedCard] = useState(null);
   var [Backend_response, setBackendResponse] = useState(null);
   var [confirmed, serConfirmed] = useState(false);
@@ -82,23 +144,6 @@ function Planning_poker({ socket }) {
 
   var [nameDisplay, setNameDisplay] = useState("");
 
-
-  var session_id = useParams().id;
-  var cards = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100]
-  var isShow = false
-  const location = useLocation()
-
-  username = "";
-  userStory = "";
-  var { username, userStory, tasks } = location.state
-  var [userStory, setUserStory] = useState(userStory);
-  var [tasks, setTasks] = useState(tasks);
-  name_session = username
-  username = username;
-  console.log("Location : " + location)
-  console.log("Username : " + username)
-  console.log("UserStory : " + userStory)
-  console.log("Tasks : " + tasks)
 
   const callBackend = () => {
     socket.emit("card",
@@ -111,14 +156,18 @@ function Planning_poker({ socket }) {
 
   const callShow = () => {
     socket.emit("show",
-     JSON.stringify({
-      "session_id": session_id
-    }));
+      JSON.stringify({
+        "session_id": session_id
+      }));
     console.log("Call show", Backend_response)
 
   }
 
   useEffect(() => {
+
+    setNBUserStory(window.localStorage.getItem('nb_userStory'));
+
+
     socket.on("receive_card", (data) => {
       console.log("Receive Card !" + data)
       setBackendResponse(data)
@@ -134,22 +183,46 @@ function Planning_poker({ socket }) {
       session_id = msg.session_id
     });
 
-    socket.on("receive_UserForm", (data) => {
-      console.log("USER Form recu du backend" + data);
-    });
 
     socket.on("receive_show", (data) => {
-      console.log("Receive Show " +  data);
-      
+      console.log("Receive Show " + data);
+
       handleShow(data);
       setBackendResponse(data)
     });
 
-    socket.on("receive_userForm", (data) => {
-      console.log("Receive UserForm " + data);
+    socket.on("receive_AddUserStory", (data) => {
+      console.log("Receive Add UserStory " + data);
+      var data = JSON.parse(data)['UserStorys']
+
+      var list_userStory = [];
+      var list_userStoryDisplay = [];
+
+      for (var i in data) {
+        let value = parseInt(i) + 1;
+        list_userStory.push("userStory : " + data[i]["userStory"] + "\n" + "tasks : " + data[i]["tasks"]);
+        list_userStoryDisplay.push(<UserStory
+          id={"userCard" + value}
+          value={value}
+          onClick={() => handleUserStoryClick(value)}
+        />);
+      }
+      setUserStorysDisplay(<div class="grid-child">{list_userStoryDisplay} </div>)
+      setUserStorys(list_userStory)
+      nb_userStory = list_userStoryDisplay.length;
+
+      console.log("Before storage : " + session_id)
+      window.localStorage.setItem("session_id", session_id)
+      window.localStorage.setItem('nb_userStory', list_userStoryDisplay.length)
+
+      console.log("NB User Story Add  : " + list_userStoryDisplay.length)
+    });
+
+    socket.on("receive_getUserStory", (data) => {
+      console.log("Receive User Story " + data);
       var msg = JSON.parse(data)
-      setUserStory(msg.title);
-      setTasks(msg.description);
+      setUserStory(msg.userStory);
+      setTasks(msg.tasks);
     });
 
     socket.on("receive_reset", (data) => {
@@ -157,6 +230,32 @@ function Planning_poker({ socket }) {
       setOtherCards(null);
     });
   }, [socket])
+
+
+  function handleUserStoryClick(i) {
+    console.log("CLICK ON : " + i)
+    setSelectedUserStory(i)
+    document.getElementById("removeUserStory").style.display = "inline-block"
+    document.getElementById("nav-link-UpdateUserStory").style.display = "inline-block"
+
+    for (var k = 1; k <= nb_userStory; k++) {
+      console.log("NB User Stories : " + nb_userStory + "   k : " + k)
+      if (k == i) {
+        document.getElementById("userCard" + k).style.backgroundColor = "#4CAF50";
+      }
+      else {
+        document.getElementById("userCard" + k).style.backgroundColor = "white";
+      }
+    }
+    socket.emit("getUserStory",
+      JSON.stringify({
+        "session_id": session_id,
+        "name_session": name_session,
+        "selectedUserStory": i
+      }));
+
+  }
+
 
   function handleCardClick(i) {
     if (!confirmed) {
@@ -194,6 +293,7 @@ function Planning_poker({ socket }) {
     isShow = false
     setOtherCards(null)
     document.getElementById("selected-card").style.backgroundColor = "#FCFCFD"
+
   }
 
   function renderReset() {
@@ -232,7 +332,7 @@ function Planning_poker({ socket }) {
     console.log(JSON.parse(data));
 
     console.log("Backend_response : " + data)
-    //var users = JSON.parse(Backend_response)
+
     var users = JSON.parse(data)['Users'];
 
     var usersCards = [];
@@ -265,7 +365,7 @@ function Planning_poker({ socket }) {
     console.log(Backend_response)
     for (var user in users) {
       estimations += users[user]['name'] + " : "
-      estimations +=users[user]['card'] +  "    ";
+      estimations += users[user]['card'] + "    ";
     }
 
     const rows = [
@@ -294,17 +394,41 @@ function Planning_poker({ socket }) {
       />)
   }
 
+  function removeUserStory() {
+    console.log("Remove : " + selectedUserStory)
+    socket.emit("removeUserStory",
+      JSON.stringify({
+        "session_id": session_id,
+        "name_session": name_session,
+        "selectedUserStory": selectedUserStory
+      }));
+    document.getElementById("removeUserStory").style.display = "none"
+    document.getElementById("nav-link-UpdateUserStory").style.display = "none"
+
+    for (var k = 1; k <= nb_userStory; k++) {
+      document.getElementById("userCard" + k).style.backgroundColor = "white";
+    }
+    setUserStory(null);
+    setTasks(null);
+  }
+
+
 
   return (
     <div class="main">
       <h3 className="id">Session Id : {session_id}</h3>
       <h2>Hello {username} !</h2>
-      <NavLink id="nav-link-Planning"  to={`/UserStory/${session_id}`} state={{username : username, userStory : userStory, tasks :  tasks}}>
-          -- Open User Story --
-      </NavLink>
+      <div><NavLink id="nav-link-AddUserStory" className="nav-link-AddUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "add", selectedUserStory: nb_userStory + 1, title: "", description : "" }}>
+        Add User Story
+      </NavLink></div>
+      <div>{userStorysDisplay}</div>
+      <div><button onClick={removeUserStory} class="removeUserStory" id="removeUserStory">Remove User Story</button>
+      <NavLink id="nav-link-UpdateUserStory" className="removeUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "update", selectedUserStory: selectedUserStory, title: userStory, description : tasks }}>
+        Update User Story
+      </NavLink></div>
       <p><strong>User Story :</strong> {userStory}</p>
       <p><strong>Tasks :</strong> {tasks}</p>
-      
+
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>
         <div class="child">{renderSquare(1)}</div>
