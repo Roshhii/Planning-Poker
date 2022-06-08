@@ -1,18 +1,54 @@
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const app = express();
 const http = require("http");
-const cors = require("cors");
 const { Server } = require("socket.io");
-app.use(cors());
+const cors = require("cors");
+const userRoutes = require("./routes/users");
+const authRoutes = require("./routes/auth");
+const historyRoutes = require("./routes/history")
+const { MongoClient } = require('mongodb');
+const connection = require("./db");
+const { User } = require("./models/user");
 
+// server
 const server = http.createServer(app);
-
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
+
+// database connection
+connection();
+
+/* // database connection
+Avec le MongoClient mais c'est une autre tehcnique qui ne marche pas avec le front
+
+var url = "mongodb://localhost:27017";
+var dbo
+MongoClient.connect(url, function(err, db) {
+  console.log("Server connected to the database")
+  if (err) throw err;
+  dbo = db.db("db_planning_poker");
+  var query = { email: "abcd@gmail.com" };
+  dbo.collection("users").find(query).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+  });
+}); */
+
+// middlewares
+app.use(express.json());
+app.use(cors());
+
+// routes
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/user/history", historyRoutes);
+
+// backend process
 
 const infoUser = new Map();
 
@@ -39,10 +75,46 @@ var UserStory_sessions = {}
 io.on('connection', (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
+
   socket.on("key", (data) => {
     console.log(`Message from user with ID: ${socket.id}: ${data}`)
     console.log(`User with ID: ${socket.id} want a key.`)
     socket.emit("receive_key", makeid(10));
+  })
+
+  /*
+  Ecouteur "login" qui récupère les données de l'utilisayeur au moment de l'authentification
+  et renvoie l'username associé : firstName-lastName
+
+  PLUS UTILISE
+  */
+  socket.on("login", async (data) => {
+    console.log("login")
+    msg = JSON.parse(data)
+    console.log("email login reçu: " + msg.email)
+    console.log("password login reçu: " + msg.password)
+
+    const user = await User.findOne({ email: msg.email });
+    console.log("USER: " + user.firstName + "; " + user.lastName)
+    socket.emit("receive_user-logged", JSON.stringify({
+      "username": user.firstName + "-" + user.lastName
+    }))
+    /* db.collection('users').find({
+      "email":msg.email
+    }) */
+    /*
+    Aller chercher les infos (firstName, lastName) des infos login reçues
+    et les envoyer pour concaténer les deux et ce sera le name_session de
+    l'utilisateur
+    */
+    /* var query = { email: msg.email };
+    dbo.collection("users").find(query).toArray(function(err, result) {
+      if (err) throw err;
+      console.log(result);
+      socket.emit("receive_user-logged", JSON.stringify({
+        "username": result[0].firstName + "-" + result[0].lastName
+      }))
+    }); */
   })
 
   socket.on("user", (data) => {
@@ -77,23 +149,15 @@ io.on('connection', (socket) => {
     if (!session_url.hasOwnProperty(session_id)) {
       session_url[session_id] = {};
     }
-
     session_url[session_id][name_session] = parseInt(card);
-
-
     var all_cards = []
     message = []
-
     for (var name in session_url[session_id]) {
-
       message.push(makeElementJSON(name, session_url, session_id));
-
       all_cards.push(session_url[session_id][name]);
     }
-
     console.log("Message : " + message)
     console.log("Message event card all users : " + '{"Users" : ' + JSON.stringify(message) + "}")
-
     if (length_sessions[session_id] == Object.keys(session_url[session_id]).length) {
       socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
       socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
@@ -153,8 +217,6 @@ io.on('connection', (socket) => {
 
     message = UserStory_sessions[session_id]
 
-    console.log()
-
     socket.emit("receive_AddUserStory", '{"UserStories" : ' + JSON.stringify(message) + "}");
     socket.to(session_id).emit("receive_AddUserStory", '{"UserStories" : ' + JSON.stringify(message) + "}");
   });
@@ -199,6 +261,31 @@ io.on('connection', (socket) => {
     socket.emit("receive_AddUserStory", '{"UserStories" : ' + JSON.stringify(message) + "}");
     socket.to(session_id).emit("receive_AddUserStory", '{"UserStories" : ' + JSON.stringify(message) + "}");
   });
+
+  socket.on("getUserStory", (data) => {
+    console.log("RECU Get User Story" + data)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var selectedUserStory = msg.selectedUserStory
+
+    message = UserStory_sessions[session_id][parseInt(selectedUserStory)-1]
+    socket.emit("receive_getUserStory", JSON.stringify(message));
+  });
+
+  socket.on("removeUserStory", (data) => {
+    console.log("RECU Remove User Story" + data)
+    var msg = JSON.parse(data);
+    var session_id = msg.session_id
+    var selectedUserStory = msg.selectedUserStory
+
+    UserStory_sessions[session_id].splice(parseInt(selectedUserStory)-1, 1)
+
+    message = UserStory_sessions[session_id]
+    console.log("New User Stories : " + UserStory_sessions[session_id]);
+    socket.emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+    socket.to(session_id).emit("receive_AddUserStory", '{"UserStorys" : ' + JSON.stringify(message) + "}");
+  });
+
 
   socket.on("disconnect", () => {
     console.log("User Diconnected", socket.id);

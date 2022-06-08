@@ -3,8 +3,6 @@ import './Planning_poker.css';
 import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 
-
-
 var name_session;
 
 
@@ -96,7 +94,6 @@ function Planning_poker({ socket }) {
   var isShow = false
 
 
-
   var { username } = location.state
 
   var [nb_userStory, setNBUserStory] = useState(0);
@@ -110,6 +107,7 @@ function Planning_poker({ socket }) {
   console.log("Username : " + username)
   console.log("UserStory : " + userStory)
   console.log("Tasks : " + tasks)
+
 
 
   console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
@@ -133,6 +131,7 @@ function Planning_poker({ socket }) {
     }
     list_userStoryDisplay = <div class="grid-child">{list_userStoryDisplay} </div>
   }
+
   else {
     list_userStoryDisplay = null;
   }
@@ -149,8 +148,6 @@ function Planning_poker({ socket }) {
   var [others_cards, setOtherCards] = useState(null);
 
   var [nameDisplay, setNameDisplay] = useState("");
-
-
   const callBackend = () => {
     socket.emit("card",
       JSON.stringify({
@@ -188,7 +185,6 @@ function Planning_poker({ socket }) {
       session_id = msg.session_id
     });
 
-
     socket.on("receive_show", (data) => {
       console.log("Receive Show " + data);
 
@@ -213,6 +209,7 @@ function Planning_poker({ socket }) {
         />);
       }
       setUserStorysDisplay(<div class="grid-child">{list_userStoryDisplay} </div>)
+
       
       nb_userStory = list_userStoryDisplay.length;
 
@@ -235,7 +232,6 @@ function Planning_poker({ socket }) {
     });
   }, [socket])
 
-
   function handleUserStoryClick(i) {
     console.log("CLICK ON : " + i)
     setSelectedUserStory(i)
@@ -257,9 +253,7 @@ function Planning_poker({ socket }) {
         "name_session": name_session,
         "selectedUserStory": i
       }));
-
   }
-
 
   function handleCardClick(i) {
     if (!confirmed) {

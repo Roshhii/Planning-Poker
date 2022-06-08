@@ -82,6 +82,7 @@ ul {
 
 li {
   float: left;
+  font-family: 'Crete Round', serif;
 }
 
 li .nav-link {
@@ -94,4 +95,8 @@ li .nav-link {
 
 li .nav-link:hover {
   background-color: #111;
+}
+
+nav {
+  background-color: #06045f;
 }

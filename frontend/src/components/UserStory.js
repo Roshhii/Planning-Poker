@@ -6,6 +6,7 @@ import './UserStory.css';
 function UserStory({ socket }) {
 
     const location = useLocation()
+
     var { username, msg, selectedUserStory, title, description } = location.state
     console.log("Nb User Storys : " + selectedUserStory)
     console.log("username : ", username)
@@ -118,7 +119,6 @@ function UserStory({ socket }) {
     const handleClick = () => {
         console.log(titleUserStory)
         console.log(descriptionUserStory)
-
         console.log("MSG : " + msg)
         if (msg == "add"){
             socket.emit("AddUserStory",
@@ -139,9 +139,7 @@ function UserStory({ socket }) {
             }));
         }
         
-        
-
-        socket.emit("UserForm",
+          socket.emit("UserForm",
             JSON.stringify({
                 "session_id": param.id,
                 "title": titleUserStory,
@@ -155,7 +153,7 @@ function UserStory({ socket }) {
             <div class="container">
                 <div class="first-line">
                     <h3 className="id">Session Id : {param.id}</h3>
-                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username }}>
+                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username, userStory: titleUserStory, tasks: descriptionUserStory, nb_userStory: nb_userStory }}>
                         -- Back to Planning Poker --
                     </NavLink>
                 </div>
