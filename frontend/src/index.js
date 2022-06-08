@@ -1,33 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
-import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Navigate  } from "react-router-dom";
-import {
-  Navigation,
-  Home,
-  Planning_poker,
-  UserStory
-} from "./components";
+import App from "./App";
 import io from 'socket.io-client'
+import { Navigation } from "./components";
+
 
 const socket = io.connect("http://localhost:3001")
 
-
 ReactDOM.render(
-  <Router>
-    <Navigation />
-    <Routes>
-      <Route exact path="/" element={<Home socket={socket}/>}/>
-      {/* <Route path="/" element={<Home socket={socket} />} /> */}
-      <Route path="/planning_poker/:id" element={<Planning_poker socket={socket} animate={true} />} />
-      <Route path="/userStory/:id" element={<UserStory socket={socket} animate={true} />} />
-    </Routes>
-  </Router>,
-
+  <React.StrictMode>
+    <BrowserRouter>
+      <Navigation />
+      <App socket={socket} />
+    </BrowserRouter>
+  </React.StrictMode>,
   document.getElementById("root")
 );
-
-
-serviceWorker.unregister();
