@@ -4,7 +4,7 @@ import Login from "./components/Login/Login.jsx";
 import "./index.css";
 import Home from "./components/Home.jsx"
 import Planning_poker from "./components/Planning_poker.js"
-import UserStory from "./components/UserStory.js"
+import UserStory from "./components/UserStory/UserStory.js"
 import History from "./components/History/History.jsx";
 
 
