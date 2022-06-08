@@ -6,13 +6,15 @@ import './UserStory.css';
 function UserStory({ socket }) {
 
     const location = useLocation()
-    var { username, msg, nb_userStory } = location.state
-    console.log("Nb User Storys : " + nb_userStory)
+
+    var { username, msg, selectedUserStory, title, description } = location.state
+    console.log("Nb User Storys : " + selectedUserStory)
     console.log("username : ", username)
+    console.log("Title UserStory : " + title)
 
     const param = useParams();
-    const [titleUserStory, setTitleUserStoryy] = useState(null);
-    const [descriptionUserStory, setDescriptionUserStory] = useState(null);
+    const [titleUserStory, setTitleUserStoryy] = useState(title);
+    const [descriptionUserStory, setDescriptionUserStory] = useState(description);
 
     function UserStoryForm() {
 
@@ -117,7 +119,6 @@ function UserStory({ socket }) {
     const handleClick = () => {
         console.log(titleUserStory)
         console.log(descriptionUserStory)
-        
         console.log("MSG : " + msg)
         if (msg == "add"){
             socket.emit("AddUserStory",
@@ -128,7 +129,17 @@ function UserStory({ socket }) {
             }));
         }
 
-        socket.emit("UserForm",
+        if (msg == "update"){
+            socket.emit("UpdateUserStory",
+            JSON.stringify({
+                "session_id": param.id,
+                "selectedUserStory" : selectedUserStory,
+                "title": titleUserStory,
+                "description": descriptionUserStory
+            }));
+        }
+        
+          socket.emit("UserForm",
             JSON.stringify({
                 "session_id": param.id,
                 "title": titleUserStory,
