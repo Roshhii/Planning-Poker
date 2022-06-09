@@ -153,7 +153,7 @@ function UserStory({ socket }) {
             <div class="container">
                 <div class="first-line">
                     <h3 className="id">Session Id : {param.id}</h3>
-                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username, userStory: titleUserStory, tasks: descriptionUserStory, nb_userStory: nb_userStory }}>
+                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username }}>
                         -- Back to Planning Poker --
                     </NavLink>
                 </div>

@@ -3,8 +3,9 @@ const { User } = require("../models/user");
 const { History } = require("../models/history");
 
 
-router.post("/", async (req, res) => {
-	try {
+
+router.post("/history", async (req, res) => {
+    try {
 
         /* 
         Il va falloir gérer les données reçues d'une session et les save dans la base de données
@@ -13,14 +14,19 @@ router.post("/", async (req, res) => {
         Il faut retrouver les données de la db history où le mail correspond à celui de l'utilisateur en cours
         */
 
-        const user = await User.findOne({ email: req.body.email });
-        const history = await History.find({email: req.body.email})
+        await History.find({ 'email': req.body.email }, 'userStory tasks votes', function (err, sessions) {
+            if (err) return handleError(err);
+            const userStory = sessions.userStory
+            const tasks = sessions.tasks
+            const votes = sessions.votes
+            res.status(201).send({ 'userStory': userStory, 'tasks': tasks, 'votes': votes  });
+        })
 
-        res.status(201).send({ history });
         
-	} catch (error) {
-		res.status(500).send({ message: "Internal Server Error" });
-	}
+
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
 });
 
 module.exports = router;
