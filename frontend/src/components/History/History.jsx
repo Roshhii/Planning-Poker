@@ -4,14 +4,12 @@ import "./History.css";
 
 function HistoryItem(props) {
     return (
-        <div class="historyItem_container">
-            <div class="historyItem_post">
-                <div class="historyItem_copy">
-                    <h3>{props.date}</h3>
-                    <p>{props.userStory}</p>
-                    <p>{props.tasks}</p>
-                    <div class="history-votes-grid-child">{props.votes}</div>
-                </div>
+        <div class="historyItem_post">
+            <div class="historyItem_copy">
+                <h3 className="date">{props.date}</h3>
+                <p>{props.userStory}</p>
+                <p>{props.tasks}</p>
+                {props.votes}
             </div>
         </div>
     );
@@ -20,22 +18,22 @@ function HistoryItem(props) {
 function VoteItem(props) {
     return (
         <div className="vote">
-            <button className="card">
+            <div className="card">
                 {props.card}
-            </button>
-            <p>{props.name}</p>
+            </div>
+            <strong>{props.name}</strong>
         </div>
     )
 
 }
 
 function History({ socket }) {
-    
+
 
     const history = localStorage.getItem("history")
 
-    
-    
+
+
     var list_sessionsDisplay = []
 
     for (let hist of JSON.parse(history)) {
@@ -54,25 +52,24 @@ function History({ socket }) {
                 card={vote.card}
             />);
         }
+        let votesDiplay = <div className="grid-history">{list_votesDisplay}</div>
         list_sessionsDisplay.push(<HistoryItem
-            date={"Date : "+ hist.date}
+            date={"Date : " + hist.date}
             userStory={userStory}
             tasks={tasks}
-            votes={list_votesDisplay}
+            votes={votesDiplay}
         />);
-        
+
     }
 
-    console.log("list_sessionsDisplay : " + list_sessionsDisplay)
-
-    let sessionsDisplay = <div class="sessions-grid-child">{list_sessionsDisplay} </div>
-
     return (
-        <div className="history-container">
-            <h1>History page</h1>
-            <p>You sessions:</p>
-            <div className="history-items-container">{sessionsDisplay}</div>
+        <div className="body">
+            <h1>You sessions:</h1>
+            <div className="history-wrapper">
+                {list_sessionsDisplay}
+            </div>
         </div>
+
     );
 };
 
