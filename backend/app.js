@@ -176,6 +176,7 @@ io.on('connection', (socket) => {
       for (var user of infoUser[session_id]){
         console.log("Username = " + user[0] + "  Email = " + user[1])
         await new Records({
+          sessionID: session_id,
           date: date,
           username: user[0],
           email: user[1],
@@ -257,6 +258,7 @@ io.on('connection', (socket) => {
         console.log("Username = " + user[0] + "  Email = " + user[1])
 
         await new Records({
+          sessionID: session_id,
           date: date,
           username: user[0],
           email: user[1],

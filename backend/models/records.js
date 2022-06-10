@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const recordsSchema = new mongoose.Schema({
+	sessionId: { type: String, required: true },
 	date: { type: Date, required: true },
 	username: { type: String, required: true },
 	email: { type: String, required: true },
