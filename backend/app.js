@@ -49,7 +49,7 @@ app.use("/api/auth", authRoutes);
 
 // backend process
 
-const infoUser = new Map();
+var infoUser = {};
 
 //Construit un élément JSON avec le vote d'un user
 function makeElementJSON(name, tab, id) {
@@ -94,7 +94,18 @@ io.on('connection', (socket) => {
     console.log(`Message from user with ID: ${socket.id}: ${data}`)
     msg = JSON.parse(data)
     socket.join(msg.session_id)
-    infoUser.set(msg.username, msg.session_id)
+
+    if (!infoUser.hasOwnProperty(msg.session_id)) {
+      infoUser[msg.session_id] = [[msg.username, msg.email]];
+    }
+    else{
+      infoUser[msg.session_id].push([msg.username, msg.email]);
+    }
+    for (var user of infoUser[msg.session_id]){
+      console.log("info User : " + user[0] + " " + user[1])
+    }
+    
+    
     if (!length_sessions.hasOwnProperty(msg.session_id)) {
       length_sessions[msg.session_id] = 1;
       creator_session[msg.session_id] = socket.id;
@@ -160,14 +171,20 @@ io.on('connection', (socket) => {
       console.log("Date: " + date)
       console.log("Email: " + email)
 
-      await new Records({
-        date: date,
-        username: username,
-        email: email,
-        userStory: usrStry,
-        tasks: tasks,
-        votes: votes
-      }).save();
+      console.log("length of infoUsers : " + infoUser[session_id].length)
+
+      for (var user of infoUser[session_id]){
+        console.log("Username = " + user[0] + "  Email = " + user[1])
+        await new Records({
+          date: date,
+          username: user[0],
+          email: user[1],
+          userStory: usrStry,
+          tasks: tasks,
+          votes: votes
+        }).save();
+      }
+      
       socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
       socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
     }
@@ -234,14 +251,20 @@ io.on('connection', (socket) => {
       console.log("Date: " + date)
       console.log("Email: " + email)
 
-      await new Records({
-        date: date,
-        username: username,
-        email: email,
-        userStory: usrStry,
-        tasks: tasks,
-        votes: votes
-      }).save();
+      console.log("length of infoUsers : " + infoUser[session_id].length)
+
+      for (var user of infoUser[session_id]){
+        console.log("Username = " + user[0] + "  Email = " + user[1])
+
+        await new Records({
+          date: date,
+          username: user[0],
+          email: user[1],
+          userStory: usrStry,
+          tasks: tasks,
+          votes: votes
+        }).save();
+      }
 
       socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
       socket.to(session_id).emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");

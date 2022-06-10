@@ -30,43 +30,42 @@ function VoteItem(props) {
 }
 
 function History({ socket }) {
+    
 
-    var [sessionsDisplay, setSessionsDisplay] = useState(list_sessionsDisplay);
+    const history = localStorage.getItem("history")
 
-    let tasks = ""
-    let userStory = ""
-
+    
+    
     var list_sessionsDisplay = []
-    var list_votesDisplay = []
 
-    const history = JSON.parse(localStorage.getItem("sessions"))
-
-    for (let hist in history) {
-        for (let task in hist.tasks) {
+    for (let hist of JSON.parse(history)) {
+        var list_votesDisplay = []
+        var tasks = "Tasks : "
+        var userStory = "UserStories : "
+        for (let task of hist.tasks) {
             tasks += task + "; "
         }
-        for (let story in hist.userStory) {
-            userStory += userStory + "; "
+        for (let story of hist.userStory) {
+            userStory += story + "; "
         }
-        for (let vote in hist.votes) {
+        for (let vote of hist.votes) {
             list_votesDisplay.push(<VoteItem
                 name={vote.name}
                 card={vote.card}
             />);
         }
         list_sessionsDisplay.push(<HistoryItem
-            date = {hist.date}
-            userStory = {userStory}
-            tasks = {tasks}
-            votes = {list_votesDisplay}
+            date={"Date : "+ hist.date}
+            userStory={userStory}
+            tasks={tasks}
+            votes={list_votesDisplay}
         />);
-        tasks = ""
-        userStory = ""
-        list_votesDisplay = []
+        
     }
 
-    list_sessionsDisplay = <div class="sessions-grid-child">{list_sessionsDisplay} </div>
-    setSessionsDisplay({list_sessionsDisplay})
+    console.log("list_sessionsDisplay : " + list_sessionsDisplay)
+
+    let sessionsDisplay = <div class="sessions-grid-child">{list_sessionsDisplay} </div>
 
     return (
         <div className="history-container">

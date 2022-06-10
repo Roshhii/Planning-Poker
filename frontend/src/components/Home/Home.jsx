@@ -6,10 +6,14 @@ var name_session
 
 function Home({ socket }) {
 
+  const history = localStorage.getItem("history")
+
+
   var [session_id, setSessionId] = useState();
 
   const localItemUser = JSON.parse(localStorage.getItem("user"))
   name_session = localItemUser.firstName + "-" + localItemUser.lastName
+  console.log("Email is : " + localItemUser.email)
 
   function IdSessionForm() {
 
@@ -19,7 +23,8 @@ function Home({ socket }) {
       evt.preventDefault();
       socket.emit("user", JSON.stringify({
         "username": name_session,
-        "session_id": id
+        "session_id": id,
+        "email": localItemUser.email
       }));
       setSessionId(id)
 
@@ -60,7 +65,8 @@ function Home({ socket }) {
       setSessionId(data);
       socket.emit("user", JSON.stringify({
         "username": name_session,
-        "session_id": data
+        "session_id": data,
+        "email": localItemUser.email
       }));
       document.getElementById("nav-link-Planning").style.display = "block"
       document.getElementById("session-key").style.display = "block"

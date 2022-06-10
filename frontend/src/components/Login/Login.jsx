@@ -23,6 +23,7 @@ function Login ({socket}) {
 			window.localStorage.setItem("token", res.data);
 			window.localStorage.setItem("user", JSON.stringify(res.user));
 			window.localStorage.setItem("history", JSON.stringify(res.sessions));
+			
 			window.location = "/";
 			//navigate("/");
 		} catch (error) {

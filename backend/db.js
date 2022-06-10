@@ -12,7 +12,7 @@ module.exports = () => {
 	};
 	try {
 		const adminPassword = encodeURIComponent( process.env.ADMIN_PASSWORD)
-		const uri = `YOUR URI DATABASE`;
+		const uri = `mongodb+srv://Roshhii:${adminPassword}@cluster0.uhbrj.mongodb.net/?retryWrites=true&w=majority`;
 		mongoose.connect(uri, connectionParams);
 		console.log("Connected to database successfully");
 	} catch (error) {
