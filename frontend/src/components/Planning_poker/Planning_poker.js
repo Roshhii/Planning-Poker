@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
 import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
 
-
-var name_session;
+//var name_session;
 
 
 function Card(props) {
@@ -101,19 +100,6 @@ function Planning_poker({ socket }) {
   var [tasks, setTasks] = useState(tasks);
   var [selectedUserStory, setSelectedUserStory] = useState(null);
 
-  name_session = username
-  username = username;
-  console.log("Location : " + location)
-  console.log("Username : " + username)
-  console.log("UserStory : " + userStory)
-  console.log("Tasks : " + tasks)
-
-
-
-  console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
-  console.log("Session before Parse JSON : " + window.localStorage.getItem('session_id'))
-  console.log("Initialisation : User Stories : " + window.localStorage.getItem('userStories') + "  " + (typeof window.localStorage.getItem('userStories')))
-
   var userStory_storage = null
 
   var list_userStoryDisplay = []
@@ -152,18 +138,20 @@ function Planning_poker({ socket }) {
     socket.emit("card",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
-        "card": selectedCard
+        "name_session": username,
+        "card": selectedCard,
+        "email": JSON.parse(localStorage.getItem("user")).email,
+        "username": username
       }));
   }
 
   const callShow = () => {
     socket.emit("show",
       JSON.stringify({
-        "session_id": session_id
+        "session_id": session_id,
+        "email": JSON.parse(localStorage.getItem("user")).email,
+        "username": username
       }));
-    console.log("Call show", Backend_response)
-
   }
 
   useEffect(() => {
@@ -179,7 +167,6 @@ function Planning_poker({ socket }) {
     socket.on("receive_user", (data) => {
       var msg = JSON.parse(data)
       console.log("Username : " + msg.username)
-      name_session = msg.username
       setNameDisplay(msg.username)
       console.log("NameDisplay : " + nameDisplay)
       session_id = msg.session_id
@@ -250,7 +237,7 @@ function Planning_poker({ socket }) {
     socket.emit("getUserStory",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, /////////////////
         "selectedUserStory": i
       }));
   }
@@ -282,7 +269,7 @@ function Planning_poker({ socket }) {
     socket.emit("reset",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, ///////////////
         "card": selectedCard
       }));
     setSelectedCard(null)
@@ -320,7 +307,8 @@ function Planning_poker({ socket }) {
     );
   }
 
-  function handleShow(data) {
+  async function handleShow(data) {
+    
     if (isShow) {
       isShow = false
     }
@@ -333,7 +321,7 @@ function Planning_poker({ socket }) {
     var usersCards = [];
     for (var user in users) {
       console.log("Users user : " + users[user])
-      if (users[user]['name'] != name_session) {
+      if (users[user]['name'] != username) { /////////////////////
         usersCards.push(<strong>{users[user]['name']} : </strong>)
         usersCards.push(<SelectedCard
           value={users[user]['card']}
@@ -341,6 +329,8 @@ function Planning_poker({ socket }) {
       }
     }
     setOtherCards(<div class="grid-child">{usersCards} </div>)
+
+   
 
   }
 
@@ -397,7 +387,7 @@ function Planning_poker({ socket }) {
     socket.emit("removeUserStory",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, ///////////////////
         "selectedUserStory": selectedUserStory
       }));
     document.getElementById("removeUserStory").style.display = "none"

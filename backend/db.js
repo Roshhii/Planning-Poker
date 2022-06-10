@@ -12,7 +12,7 @@ module.exports = () => {
 	};
 	try {
 		const adminPassword = encodeURIComponent( process.env.ADMIN_PASSWORD)
-		//const uri = YOU URI DATABASE
+		const uri = `YOUR URI DATABASE`;
 		mongoose.connect(uri, connectionParams);
 		console.log("Connected to database successfully");
 	} catch (error) {

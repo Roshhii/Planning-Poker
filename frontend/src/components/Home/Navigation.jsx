@@ -11,6 +11,7 @@ function Navigation() {
     localStorage.removeItem("token");
     localStorage.removeItem("user")
     localStorage.removeItem("sessionActive")
+    localStorage.clear()
     window.location = "/";
   };
 

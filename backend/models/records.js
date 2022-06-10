@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
 
-const historySchema = new mongoose.Schema({
+const recordsSchema = new mongoose.Schema({
+	date: { type: Date, required: true },
 	username: { type: String, required: true },
-	mail: { type: String, required: true },
+	email: { type: String, required: true },
 	userStory: { type: Array, required: true },
 	tasks: { type: Array, required: true },
 	votes: { type: Array, required: true },
 });
 
-const History = mongoose.model("history", historySchema);
+const Records = mongoose.model("records", recordsSchema);
 
-module.exports = { History }
+module.exports = { Records }
 
 

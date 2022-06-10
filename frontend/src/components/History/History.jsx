@@ -1,6 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
 import "./History.css";
 
 
@@ -12,54 +10,69 @@ function HistoryItem(props) {
                     <h3>{props.date}</h3>
                     <p>{props.userStory}</p>
                     <p>{props.tasks}</p>
-                    <p>{props.votes}</p>
+                    <div class="history-votes-grid-child">{props.votes}</div>
                 </div>
             </div>
         </div>
     );
 }
 
+function VoteItem(props) {
+    return (
+        <div className="vote">
+            <button className="card">
+                {props.card}
+            </button>
+            <p>{props.name}</p>
+        </div>
+    )
+
+}
+
 function History({ socket }) {
 
-    var userStory = []
-    var tasks = []
-    var votes = []
+    var [sessionsDisplay, setSessionsDisplay] = useState(list_sessionsDisplay);
 
-    const localItemUser = JSON.parse(localStorage.getItem("user"))
-    let email = localItemUser.email
+    let tasks = ""
+    let userStory = ""
 
-    const getHistory = () => {
-        let infoHistory = axios.get("http://localhost:3001//user/history")
-        let msg = JSON.parse(infoHistory);
-        userStory = msg.userStory
-        tasks = msg.tasks
-        votes = msg.votes
+    var list_sessionsDisplay = []
+    var list_votesDisplay = []
+
+    const history = JSON.parse(localStorage.getItem("sessions"))
+
+    for (let hist in history) {
+        for (let task in hist.tasks) {
+            tasks += task + "; "
+        }
+        for (let story in hist.userStory) {
+            userStory += userStory + "; "
+        }
+        for (let vote in hist.votes) {
+            list_votesDisplay.push(<VoteItem
+                name={vote.name}
+                card={vote.card}
+            />);
+        }
+        list_sessionsDisplay.push(<HistoryItem
+            date = {hist.date}
+            userStory = {userStory}
+            tasks = {tasks}
+            votes = {list_votesDisplay}
+        />);
+        tasks = ""
+        userStory = ""
+        list_votesDisplay = []
     }
 
-    for (var i = 0; i < userStory; i++) {
-       
-    }
-
-
-
-    function renderHistoryItem() {
-        return (
-            <HistoryItem
-                date=""
-                userStory=""
-                tasks=""
-                votes=""
-            />
-        );
-    }
+    list_sessionsDisplay = <div class="sessions-grid-child">{list_sessionsDisplay} </div>
+    setSessionsDisplay({list_sessionsDisplay})
 
     return (
         <div className="history-container">
             <h1>History page</h1>
             <p>You sessions:</p>
-            <ul className="history-items-container">
-
-            </ul>
+            <div className="history-items-container">{sessionsDisplay}</div>
         </div>
     );
 };

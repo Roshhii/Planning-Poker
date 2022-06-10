@@ -25,7 +25,6 @@ function Home({ socket }) {
 
       document.getElementById("nav-link-Planning").style.display = "block"
       document.getElementById("session-key").style.display = "block"
-      document.getElementById("send-button").style.display = "inline-block"
     }
 
     const handleChange = (evt) => {
@@ -52,7 +51,7 @@ function Home({ socket }) {
   }
 
   const handleStart = () => {
-    localStorage.setItem("sessionActive", session_id);
+    window.localStorage.setItem("sessionActive", session_id);
   };
 
   useEffect(() => {
