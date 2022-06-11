@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
+import { useParams, NavLink, useLocation } from "react-router-dom"
 
 //var name_session;
 
