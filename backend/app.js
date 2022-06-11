@@ -175,15 +175,24 @@ io.on('connection', (socket) => {
 
       for (var user of infoUser[session_id]){
         console.log("Username = " + user[0] + "  Email = " + user[1])
+
+        const filter = { sessionId: session_id, email: user[1], username: user[0] };
+        const update = {date: date, userStory: usrStry, tasks: tasks, votes: votes };
+        
+        await Records.findOneAndUpdate(filter, update, {
+          new: true,
+          upsert: true // Make this update into an upsert
+        });
+        /*
         await new Records({
-          sessionID: session_id,
+          sessionId: session_id,
           date: date,
           username: user[0],
           email: user[1],
           userStory: usrStry,
           tasks: tasks,
           votes: votes
-        }).save();
+        }).save();*/
       }
       
       socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
@@ -258,7 +267,16 @@ io.on('connection', (socket) => {
       for (var user of infoUser[session_id]){
         console.log("Username = " + user[0] + "  Email = " + user[1])
 
-        await new Records({
+        
+        const filter = { sessionId: session_id, email: user[1], username: user[0] };
+        const update = {date: date, userStory: usrStry, tasks: tasks, votes: votes };
+        
+        await Records.findOneAndUpdate(filter, update, {
+          new: true,
+          upsert: true // Make this update into an upsert
+        });
+
+      /*  await new Records({
           sessionId: session_id,
           date: date,
           username: user[0],
@@ -266,7 +284,7 @@ io.on('connection', (socket) => {
           userStory: usrStry,
           tasks: tasks,
           votes: votes
-        }).save();
+        }).save();*/
       }
 
       socket.emit("receive_show", '{"Users" : ' + JSON.stringify(message) + "}");
