@@ -18,7 +18,7 @@ function HistoryItem(props) {
 function VoteItem(props) {
     return (
         <div className="vote">
-            <div className="card">
+            <div className="card-vote">
                 {props.card}
             </div>
             <strong>{props.name}</strong>
@@ -64,7 +64,7 @@ function History({ socket }) {
 
     return (
         <div className="body">
-            <h1>You sessions:</h1>
+            <h2>You sessions:</h2>
             <div className="history-wrapper">
                 {list_sessionsDisplay}
             </div>

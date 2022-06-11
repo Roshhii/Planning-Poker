@@ -24,8 +24,9 @@ function Navigation() {
             {/* <li><NavLink className="nav-link" onClick={handleLogout} to="/login">Logout</NavLink></li> */}
             {/* <li><NavLink className="nav-link" to="/history">History</NavLink></li> */}
             {user && <li><NavLink className="nav-link" to="/history">History</NavLink></li>}
+            {sessionActive && <li><NavLink className="nav-link" to={`/Planning_poker/${sessionActive}`} state={{ username: localStorage.getItem("username")}}>Planning-poker</NavLink></li>}
             {user && <li><NavLink className="nav-link" id="logout" onClick={handleLogout} to="/login">Logout</NavLink></li>}
-            {sessionActive && <li><NavLink className="nav-link" to={`/planning_poker/${sessionActive}`}>Planning-poker</NavLink></li>}
+            
           </ul>
         </div>
       </nav>

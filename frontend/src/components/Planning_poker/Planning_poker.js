@@ -75,7 +75,7 @@ function UserStory(props) {
   return (
     <button
       id={props.id}
-      className="card"
+      className="userStory"
       onClick={props.onClick}
     >
       {props.value}
@@ -93,6 +93,7 @@ function Planning_poker({ socket }) {
   var isShow = false
 
 
+  //var { username } = localStorage.getItem("username")
   var { username } = location.state
 
   var [nb_userStory, setNBUserStory] = useState(0);
@@ -228,7 +229,7 @@ function Planning_poker({ socket }) {
     for (var k = 1; k <= nb_userStory; k++) {
       console.log("NB User Stories : " + nb_userStory + "   k : " + k)
       if (k == i) {
-        document.getElementById("userCard" + k).style.backgroundColor = "#4CAF50";
+        document.getElementById("userCard" + k).style.backgroundColor = "#aaaaaa";
       }
       else {
         document.getElementById("userCard" + k).style.backgroundColor = "white";
@@ -278,6 +279,7 @@ function Planning_poker({ socket }) {
     isShow = false
     setOtherCards(null)
     document.getElementById("selected-card").style.backgroundColor = "#FCFCFD"
+    document.getElementById("selected-card").style.border = "unset"
 
   }
 
@@ -293,7 +295,7 @@ function Planning_poker({ socket }) {
   function handleConfirmClick() {
     if (selectedCard != null && !confirmed) {
       serConfirmed(true)
-      document.getElementById("selected-card").style.backgroundColor = "#4CAF50"
+      document.getElementById("selected-card").style.border = "3px solid #45B636"
       callBackend()
     }
   }
@@ -323,7 +325,7 @@ function Planning_poker({ socket }) {
       console.log("Users user : " + users[user])
       if (users[user]['name'] != username) { /////////////////////
         usersCards.push(<strong>{users[user]['name']} : </strong>)
-        usersCards.push(<SelectedCard
+        usersCards.push(<Card
           value={users[user]['card']}
         />);
       }
@@ -414,8 +416,8 @@ function Planning_poker({ socket }) {
       <NavLink id="nav-link-UpdateUserStory" className="removeUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "update", selectedUserStory: selectedUserStory, title: userStory, description : tasks }}>
         Update User Story
       </NavLink></div>
-      <p><strong>User Story :</strong> {userStory}</p>
-      <p><strong>Tasks :</strong> {tasks}</p>
+      <h2 style={{marginTop: 12}}><strong>User Story :</strong> {userStory}</h2>
+      <h2 style={{marginTop: 12}}><strong>Tasks :</strong> {tasks}</h2>
 
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>

@@ -13,6 +13,7 @@ function Home({ socket }) {
 
   const localItemUser = JSON.parse(localStorage.getItem("user"))
   name_session = localItemUser.firstName + "-" + localItemUser.lastName
+  window.localStorage.setItem("username", name_session)
   console.log("Email is : " + localItemUser.email)
 
   function IdSessionForm() {

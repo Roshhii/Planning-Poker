@@ -25,18 +25,18 @@ const io = new Server(server, {
 connection();
 
 const getUser = async () => {
-  const user = await User.find({});
-  console.log("User: " + user)
+  const user = await User.find({email: 'lconan@gmail.com'});
+  console.log("Louis-Conan: " + user)
 }
 
-const getHistory = async () => {
+/* const getHistory = async () => {
   const user = await Records.find({});
   console.log("Records: " + user)
-}
+} */
 
 
 getUser()
-getHistory()
+//getHistory()
 
 
 // middlewares
@@ -251,6 +251,7 @@ io.on('connection', (socket) => {
       console.log("Votes: " + votes)
       console.log("Date: " + date)
       console.log("Email: " + email)
+      console.log("SessionID: " + session_id)
 
       console.log("length of infoUsers : " + infoUser[session_id].length)
 
@@ -258,7 +259,7 @@ io.on('connection', (socket) => {
         console.log("Username = " + user[0] + "  Email = " + user[1])
 
         await new Records({
-          sessionID: session_id,
+          sessionId: session_id,
           date: date,
           username: user[0],
           email: user[1],
