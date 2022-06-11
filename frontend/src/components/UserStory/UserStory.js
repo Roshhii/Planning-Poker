@@ -153,15 +153,15 @@ function UserStory({ socket }) {
             <div class="container">
                 <div class="first-line">
                     <h3 className="id">Session Id : {param.id}</h3>
-                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username, userStory: titleUserStory, tasks: descriptionUserStory, nb_userStory: nb_userStory }}>
+                    <NavLink id="nav-link-Planning" to={`/Planning_poker/${param.id}`} state={{ username: username }}>
                         -- Back to Planning Poker --
                     </NavLink>
                 </div>
-                <h2>User Story</h2>
+                <h3>User Story</h3>
                 <div><UserStoryForm /></div>
                 <div><JiraImport /></div>
-                <p>User Story : {titleUserStory}</p>
-                <p>Tasks : {descriptionUserStory}</p>
+                <p style={{fontSize: 16}}>User Story : {titleUserStory}</p>
+                <p style={{fontSize: 16}}>Tasks : {descriptionUserStory}</p>
                 <button className="button" onClick={handleClick}>Confirm</button>
             </div>
         </div>

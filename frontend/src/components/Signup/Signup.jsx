@@ -23,7 +23,7 @@ function Signup () {
 			console.log("handleSubmit Signup")
 			const url = "http://localhost:3001/api/users/";
 			const { data: res } = await axios.post(url, data);
-			localStorage.setItem("user", JSON.stringify(res.new_user));
+			window.localStorage.setItem("user", JSON.stringify(res.new_user));
 			/*
 			Il faut qu'on aille au /login pour valider l'authentification avec le token
 			{user && <Route path="/" exact element={<Home socket={socket} />} />}

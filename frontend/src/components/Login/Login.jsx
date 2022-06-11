@@ -18,11 +18,12 @@ function Login ({socket}) {
 		e.preventDefault();
 		try {
 			const url = "http://localhost:3001/api/auth";
-			//Envoie les données à la route /api/auth => auth.js (routes)
 			const { data: res } = await axios.post(url, data);
 			console.log(res.message);
-			localStorage.setItem("token", res.data);
-			localStorage.setItem("user", JSON.stringify(res.user));
+			window.localStorage.setItem("token", res.data);
+			window.localStorage.setItem("user", JSON.stringify(res.user));
+			window.localStorage.setItem("history", JSON.stringify(res.sessions));
+			
 			window.location = "/";
 			//navigate("/");
 		} catch (error) {

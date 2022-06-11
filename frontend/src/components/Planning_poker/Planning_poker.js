@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import './Planning_poker.css';
-import { useParams, NavLink, useLocation, useNavigate } from "react-router-dom"
+import { useParams, NavLink, useLocation } from "react-router-dom"
 
-
-var name_session;
+//var name_session;
 
 
 function Card(props) {
@@ -76,7 +75,7 @@ function UserStory(props) {
   return (
     <button
       id={props.id}
-      className="card"
+      className="userStory"
       onClick={props.onClick}
     >
       {props.value}
@@ -94,25 +93,13 @@ function Planning_poker({ socket }) {
   var isShow = false
 
 
+  //var { username } = localStorage.getItem("username")
   var { username } = location.state
 
   var [nb_userStory, setNBUserStory] = useState(0);
   var [userStory, setUserStory] = useState(userStory);
   var [tasks, setTasks] = useState(tasks);
   var [selectedUserStory, setSelectedUserStory] = useState(null);
-
-  name_session = username
-  username = username;
-  console.log("Location : " + location)
-  console.log("Username : " + username)
-  console.log("UserStory : " + userStory)
-  console.log("Tasks : " + tasks)
-
-
-
-  console.log("Initialisation :  Nb User Stories : " + window.localStorage.getItem('nb_userStory'))
-  console.log("Session before Parse JSON : " + window.localStorage.getItem('session_id'))
-  console.log("Initialisation : User Stories : " + window.localStorage.getItem('userStories') + "  " + (typeof window.localStorage.getItem('userStories')))
 
   var userStory_storage = null
 
@@ -152,18 +139,20 @@ function Planning_poker({ socket }) {
     socket.emit("card",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
-        "card": selectedCard
+        "name_session": username,
+        "card": selectedCard,
+        "email": JSON.parse(localStorage.getItem("user")).email,
+        "username": username
       }));
   }
 
   const callShow = () => {
     socket.emit("show",
       JSON.stringify({
-        "session_id": session_id
+        "session_id": session_id,
+        "email": JSON.parse(localStorage.getItem("user")).email,
+        "username": username
       }));
-    console.log("Call show", Backend_response)
-
   }
 
   useEffect(() => {
@@ -179,7 +168,6 @@ function Planning_poker({ socket }) {
     socket.on("receive_user", (data) => {
       var msg = JSON.parse(data)
       console.log("Username : " + msg.username)
-      name_session = msg.username
       setNameDisplay(msg.username)
       console.log("NameDisplay : " + nameDisplay)
       session_id = msg.session_id
@@ -241,7 +229,7 @@ function Planning_poker({ socket }) {
     for (var k = 1; k <= nb_userStory; k++) {
       console.log("NB User Stories : " + nb_userStory + "   k : " + k)
       if (k == i) {
-        document.getElementById("userCard" + k).style.backgroundColor = "#4CAF50";
+        document.getElementById("userCard" + k).style.backgroundColor = "#aaaaaa";
       }
       else {
         document.getElementById("userCard" + k).style.backgroundColor = "white";
@@ -250,7 +238,7 @@ function Planning_poker({ socket }) {
     socket.emit("getUserStory",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, /////////////////
         "selectedUserStory": i
       }));
   }
@@ -282,7 +270,7 @@ function Planning_poker({ socket }) {
     socket.emit("reset",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, ///////////////
         "card": selectedCard
       }));
     setSelectedCard(null)
@@ -291,6 +279,7 @@ function Planning_poker({ socket }) {
     isShow = false
     setOtherCards(null)
     document.getElementById("selected-card").style.backgroundColor = "#FCFCFD"
+    document.getElementById("selected-card").style.border = "unset"
 
   }
 
@@ -306,7 +295,7 @@ function Planning_poker({ socket }) {
   function handleConfirmClick() {
     if (selectedCard != null && !confirmed) {
       serConfirmed(true)
-      document.getElementById("selected-card").style.backgroundColor = "#4CAF50"
+      document.getElementById("selected-card").style.border = "3px solid #45B636"
       callBackend()
     }
   }
@@ -320,7 +309,8 @@ function Planning_poker({ socket }) {
     );
   }
 
-  function handleShow(data) {
+  async function handleShow(data) {
+    
     if (isShow) {
       isShow = false
     }
@@ -333,14 +323,16 @@ function Planning_poker({ socket }) {
     var usersCards = [];
     for (var user in users) {
       console.log("Users user : " + users[user])
-      if (users[user]['name'] != name_session) {
+      if (users[user]['name'] != username) { /////////////////////
         usersCards.push(<strong>{users[user]['name']} : </strong>)
-        usersCards.push(<SelectedCard
+        usersCards.push(<Card
           value={users[user]['card']}
         />);
       }
     }
     setOtherCards(<div class="grid-child">{usersCards} </div>)
+
+   
 
   }
 
@@ -397,7 +389,7 @@ function Planning_poker({ socket }) {
     socket.emit("removeUserStory",
       JSON.stringify({
         "session_id": session_id,
-        "name_session": name_session,
+        "name_session": username, ///////////////////
         "selectedUserStory": selectedUserStory
       }));
     document.getElementById("removeUserStory").style.display = "none"
@@ -424,8 +416,8 @@ function Planning_poker({ socket }) {
       <NavLink id="nav-link-UpdateUserStory" className="removeUserStory" to={`/UserStory/${session_id}`} state={{ username: username, msg: "update", selectedUserStory: selectedUserStory, title: userStory, description : tasks }}>
         Update User Story
       </NavLink></div>
-      <p><strong>User Story :</strong> {userStory}</p>
-      <p><strong>Tasks :</strong> {tasks}</p>
+      <h2 style={{marginTop: 12}}><strong>User Story :</strong> {userStory}</h2>
+      <h2 style={{marginTop: 12}}><strong>Tasks :</strong> {tasks}</h2>
 
       <div id="line-cards-buttons">
         <div class="child">{renderSquare(0)}</div>

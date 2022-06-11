@@ -5,10 +5,13 @@ import { NavLink } from "react-router-dom";
 function Navigation() {
 
   const user = localStorage.getItem("token");
+  const sessionActive = localStorage.getItem("sessionActive")
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user")
+    localStorage.removeItem("sessionActive")
+    localStorage.clear()
     window.location = "/";
   };
 
@@ -21,7 +24,9 @@ function Navigation() {
             {/* <li><NavLink className="nav-link" onClick={handleLogout} to="/login">Logout</NavLink></li> */}
             {/* <li><NavLink className="nav-link" to="/history">History</NavLink></li> */}
             {user && <li><NavLink className="nav-link" to="/history">History</NavLink></li>}
+            {sessionActive && <li><NavLink className="nav-link" to={`/Planning_poker/${sessionActive}`} state={{ username: localStorage.getItem("username")}}>Planning-poker</NavLink></li>}
             {user && <li><NavLink className="nav-link" id="logout" onClick={handleLogout} to="/login">Logout</NavLink></li>}
+            
           </ul>
         </div>
       </nav>
