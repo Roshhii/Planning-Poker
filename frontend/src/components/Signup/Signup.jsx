@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 
-function Signup () {
+function Signup() {
 	const [data, setData] = useState({
 		firstName: "",
 		lastName: "",
@@ -19,29 +19,43 @@ function Signup () {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		try {
-			console.log("handleSubmit Signup")
-			const url = "http://localhost:3001/api/users/";
-			const { data: res } = await axios.post(url, data);
-			window.localStorage.setItem("user", JSON.stringify(res.new_user));
-			/*
-			Il faut qu'on aille au /login pour valider l'authentification avec le token
-			{user && <Route path="/" exact element={<Home socket={socket} />} />}
-			Mais on aurait pu le faire dans le Signup aussi (users.js)
-			*/
+		if (checked) {
+			try {
+				console.log("handleSubmit Signup")
+				const url = "http://localhost:3001/api/users/";
+				const { data: res } = await axios.post(url, data);
+				window.localStorage.setItem("user", JSON.stringify(res.new_user));
+				/*
+				Il faut qu'on aille au /login pour valider l'authentification avec le token
+				{user && <Route path="/" exact element={<Home socket={socket} />} />}
+				Mais on aurait pu le faire dans le Signup aussi (users.js)
+				*/
 
-			navigate("/login");
-			console.log(res.message);
-		} catch (error) {
-			if (
-				error.response &&
-				error.response.status >= 400 &&
-				error.response.status <= 500
-			) {
-				setError(error.response.data.message);
+				navigate("/login");
+				console.log(res.message);
+			} catch (error) {
+				if (
+					error.response &&
+					error.response.status >= 400 &&
+					error.response.status <= 500
+				) {
+					setError(error.response.data.message);
+				}
 			}
 		}
+		else {
+			setError("Please check the data policy")
+		}
+
 	};
+
+	const [checked, setChecked] = useState(false);
+
+	const handleChange_check = () => {
+		setChecked(!checked);
+	};
+
+
 
 	return (
 		<div className={styles.signup_container}>
@@ -93,6 +107,14 @@ function Signup () {
 							required
 							className={styles.input}
 						/>
+						<label>
+							<input
+								type="checkbox"
+								checked={checked}
+								onChange={handleChange_check}
+							/>
+							I accept the Personal data policy
+						</label>
 						{error && <div className={styles.error_msg}>{error}</div>}
 						<button type="submit" className={styles.green_btn}>
 							Sing Up

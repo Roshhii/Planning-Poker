@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  planning_poker_backend:
+    container_name: planning_poker_backend
+    image: planningpokertsd.azurecr.io/planning_poker_backend
+    env_file:
+        "./backend/.env"
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "3001:3001"
+  planning_poker_frontend:
+    container_name: planning_poker_frontend
+    image: planningpokertsd.azurecr.io/planning_poker_frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS: planning_poker_backend
