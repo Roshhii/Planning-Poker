@@ -3,6 +3,12 @@
 ## Link to the application
 [https://secret-stream-38362.herokuapp.com](https://secret-stream-38362.herokuapp.com/)
 
+## Docker
+```
+docker-compose build
+docker-compose up
+```
+
 ## Backend
 ```
 cd backend
