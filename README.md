@@ -1,5 +1,8 @@
 # Planning-Poker
 
+## Link to the application
+[https://secret-stream-38362.herokuapp.com](https://secret-stream-38362.herokuapp.com/)
+
 ## Backend
 ```
 cd backend
